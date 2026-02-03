@@ -47,6 +47,7 @@
             ClientesBindingSource = new BindingSource(components);
             label1 = new Label();
             IdTextBox = new TextBox();
+            label7 = new Label();
             ((System.ComponentModel.ISupportInitialize)ClienteBindingSource).BeginInit();
             ((System.ComponentModel.ISupportInitialize)categoriaBindingSource).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ClientesBindingSource).BeginInit();
@@ -54,7 +55,7 @@
             // 
             // ClienteBindingSource
             // 
-            ClienteBindingSource.DataSource = typeof(Data.DTOs.ClienteDTO);
+            ClienteBindingSource.DataSource = typeof(Data.Modelo.Cliente);
             // 
             // NombreTextBox
             // 
@@ -213,12 +214,23 @@
             IdTextBox.Size = new Size(156, 23);
             IdTextBox.TabIndex = 1;
             // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Font = new Font("Segoe UI", 16F);
+            label7.Location = new Point(161, 9);
+            label7.Name = "label7";
+            label7.Size = new Size(179, 30);
+            label7.TabIndex = 15;
+            label7.Text = "Actualizar Cliente";
+            // 
             // ClientesEditForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.InactiveCaption;
             ClientSize = new Size(527, 343);
+            Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(TestButton);
             Controls.Add(CancelarButton);
@@ -264,5 +276,6 @@
         private BindingSource ClientesBindingSource;
         private Label label1;
         private TextBox IdTextBox;
+        private Label label7;
     }
 }

@@ -43,6 +43,7 @@
             NombreTextBox = new TextBox();
             label2 = new Label();
             CategoriaCombobox = new ComboBox();
+            label1 = new Label();
             ((System.ComponentModel.ISupportInitialize)clienteBindingSource).BeginInit();
             ((System.ComponentModel.ISupportInitialize)categoriaBindingSource).BeginInit();
             SuspendLayout();
@@ -166,12 +167,23 @@
             CategoriaCombobox.TabIndex = 29;
             CategoriaCombobox.ValueMember = "Id";
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 16F);
+            label1.Location = new Point(182, 9);
+            label1.Name = "label1";
+            label1.Size = new Size(159, 30);
+            label1.TabIndex = 30;
+            label1.Text = "Insertar Cliente";
+            // 
             // ClientesInsertForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.InactiveCaption;
             ClientSize = new Size(527, 343);
+            Controls.Add(label1);
             Controls.Add(CategoriaCombobox);
             Controls.Add(label6);
             Controls.Add(CancelarButton);
@@ -210,5 +222,6 @@
         private BindingSource clienteBindingSource;
         private BindingSource categoriaBindingSource;
         private ComboBox CategoriaCombobox;
+        private Label label1;
     }
 }

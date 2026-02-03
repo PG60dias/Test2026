@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Linq;
 using Data.Modelo;
 using Desktop;
 using Domain.Services;
@@ -99,48 +100,39 @@ namespace Test2026
 
         }
 
-		private void PremiumCheckBox_CheckedChanged(object sender, EventArgs e)
-		{
-			var todosClientes = _service.Repository.GetAllClientes().ToList();
-
-			if (PremiumCheckBox.Checked)
-			{
-				var clientesPremium = todosClientes.Where(c => c.Categoria == 2).ToList();
-				ClientesBindingSource.DataSource = clientesPremium;
-			}
-			else
-			{
-				ClientesBindingSource.DataSource = todosClientes;
-			}
-		}
-		private void ClientesStandarCheckBox_CheckedChanged(object sender, EventArgs e)
+		private void ClientesPremiumCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-			var todosClientes = _service.Repository.GetAllClientes().ToList();
-
-			if (ClientesPruebaCheckBox.Checked)
-			{
-				var clientesStandard = todosClientes.Where(c => c.Categoria == 1).ToList();
-				ClientesBindingSource.DataSource = clientesStandard;
-			}
-			else
-			{
-				ClientesBindingSource.DataSource = todosClientes;
-			}
-		}
+            AplicarFiltros();
+        }
+        private void ClientesStandarCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            AplicarFiltros();
+        }
 
         private void ClientePruebaCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-			var todosClientes = _service.Repository.GetAllClientes().ToList();
+            AplicarFiltros();
+        }
 
-			if (ClientesPruebaCheckBox.Checked)
-			{
-				var clientesPrueba = todosClientes.Where(c => c.Categoria == 3).ToList();
-				ClientesBindingSource.DataSource = clientesPrueba;
-			}
-			else
-			{
-				ClientesBindingSource.DataSource = todosClientes;
-			}
-		}
+        private void AplicarFiltros()
+        {
+            var clientes = _service.Repository.GetAllClientes().AsEnumerable();
+
+            List<int> categoriasSeleccionadas = new List<int>();
+
+            if (PremiumCheckBox.Checked) categoriasSeleccionadas.Add(2);
+            if (ClientesStandardCheckBox.Checked) categoriasSeleccionadas.Add(1);
+            if (ClientesPruebaCheckBox.Checked) categoriasSeleccionadas.Add(3);
+
+            if (categoriasSeleccionadas.Any())
+            {
+                clientes = clientes.Where(c => categoriasSeleccionadas.Contains(c.Categoria ?? 0));
+            }
+
+            _clientesBindingList = new BindingList<Cliente>(clientes.ToList());
+            ClientesBindingSource.DataSource = _clientesBindingList;
+        }
+
+
     }
 }

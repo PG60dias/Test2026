@@ -29,10 +29,10 @@ public partial class Cliente
 
 	public int? Categoria { get; set; }
 
-	[NotMapped]
-	public string CategoriaNombre => CategoriaNavigation?.Nombre ?? "Sin Categoría";
+    [NotMapped]
+    public string CategoriaNombre => CategoriaNavigation?.Nombre ?? "Sin Categoría";
 
-	[ForeignKey("Categoria")]
-	public virtual Categoria? CategoriaNavigation { get; set; }
+    [ForeignKey("Categoria")]
+    public virtual Categoria? CategoriaNavigation { get; set; }
 
 }

@@ -29,17 +29,5 @@ namespace Domain.Services
 				   original.Telefono != telefono ||
 				   original.Categoria != categoriaId;
 		}
-
-		//public void ConfirmarEdicion(Cliente original, Cliente editado)
-		//{
-		//	original.Nombre = editado.Nombre;
-		//	original.Direccion = editado.Direccion;
-		//	original.Email = editado.Email;
-		//	original.Telefono = editado.Telefono;
-		//	original.Categoria = editado.Categoria;
-
-		//	original.CategoriaNavigation = editado.CategoriaNavigation;
-		//	Repository.UpdateCliente(original);
-		//}
 	}
 }
