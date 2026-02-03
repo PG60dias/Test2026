@@ -54,7 +54,7 @@
             // 
             // ClienteBindingSource
             // 
-            ClienteBindingSource.DataSource = typeof(Data.Modelo.Cliente);
+            ClienteBindingSource.DataSource = typeof(Data.DTOs.ClienteDTO);
             // 
             // NombreTextBox
             // 
@@ -146,6 +146,9 @@
             // 
             // AceptarButton
             // 
+            AceptarButton.FlatAppearance.BorderSize = 0;
+            AceptarButton.FlatAppearance.MouseOverBackColor = SystemColors.ActiveCaption;
+            AceptarButton.FlatStyle = FlatStyle.Flat;
             AceptarButton.Location = new Point(98, 291);
             AceptarButton.Name = "AceptarButton";
             AceptarButton.Size = new Size(75, 23);
@@ -156,6 +159,9 @@
             // 
             // CancelarButton
             // 
+            CancelarButton.FlatAppearance.BorderSize = 0;
+            CancelarButton.FlatAppearance.MouseOverBackColor = SystemColors.ActiveCaption;
+            CancelarButton.FlatStyle = FlatStyle.Flat;
             CancelarButton.Location = new Point(179, 291);
             CancelarButton.Name = "CancelarButton";
             CancelarButton.Size = new Size(75, 23);
@@ -166,6 +172,9 @@
             // 
             // TestButton
             // 
+            TestButton.FlatAppearance.BorderSize = 0;
+            TestButton.FlatAppearance.MouseOverBackColor = SystemColors.ActiveCaption;
+            TestButton.FlatStyle = FlatStyle.Flat;
             TestButton.Location = new Point(425, 274);
             TestButton.Name = "TestButton";
             TestButton.Size = new Size(90, 57);
@@ -208,6 +217,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.InactiveCaption;
             ClientSize = new Size(527, 343);
             Controls.Add(label6);
             Controls.Add(TestButton);

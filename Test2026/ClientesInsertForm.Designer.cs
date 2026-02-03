@@ -58,6 +58,9 @@
             // 
             // CancelarButton
             // 
+            CancelarButton.FlatAppearance.BorderSize = 0;
+            CancelarButton.FlatAppearance.MouseOverBackColor = SystemColors.ActiveCaption;
+            CancelarButton.FlatStyle = FlatStyle.Flat;
             CancelarButton.Location = new Point(263, 254);
             CancelarButton.Name = "CancelarButton";
             CancelarButton.Size = new Size(75, 23);
@@ -68,6 +71,9 @@
             // 
             // AceptarButton
             // 
+            AceptarButton.FlatAppearance.BorderSize = 0;
+            AceptarButton.FlatAppearance.MouseOverBackColor = SystemColors.ActiveCaption;
+            AceptarButton.FlatStyle = FlatStyle.Flat;
             AceptarButton.Location = new Point(182, 254);
             AceptarButton.Name = "AceptarButton";
             AceptarButton.Size = new Size(75, 23);
@@ -164,6 +170,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.InactiveCaption;
             ClientSize = new Size(527, 343);
             Controls.Add(CategoriaCombobox);
             Controls.Add(label6);

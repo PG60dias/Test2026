@@ -17,7 +17,7 @@ namespace Test2026
         [STAThread]
         static void Main()
         {
-            ApplicationConfiguration.Initialize();
+			ApplicationConfiguration.Initialize();
 
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using PropertyChanged;
@@ -18,21 +17,22 @@ public partial class Cliente
 
     [StringLength(50)]
     [Unicode(false)]
-    public string? Direccion { get; set; }
+    public string? Direccion { get; set; } = string.Empty;
 
-    [StringLength(50)]
+	[StringLength(50)]
     [Unicode(false)]
-    public string? Email { get; set; }
+    public string? Email { get; set; } = string.Empty;
 
-    [StringLength(50)]
+	[StringLength(50)]
     [Unicode(false)]
-    public string? Telefono { get; set; }
+    public string? Telefono { get; set; } = string.Empty;
 
-    public int? Categoria { get; set; }
+	public int? Categoria { get; set; }
 
 	[NotMapped]
-	public string CategoriaNombre => CategoriaNavigation?.Nombre;
+	public string CategoriaNombre => CategoriaNavigation?.Nombre ?? "Sin Categoría";
 
 	[ForeignKey("Categoria")]
 	public virtual Categoria? CategoriaNavigation { get; set; }
+
 }

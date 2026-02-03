@@ -3,10 +3,10 @@ using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Desktop
-{
+{ 
     public partial class ClientesEditForm : Form
     {
-        private Cliente _cliente;
+        private Cliente _cliente = null!;
         private readonly ClienteService _service;
         private readonly CategoriaService _categoriaService;
 
@@ -17,6 +17,7 @@ namespace Desktop
             _service = service;
             _categoriaService = categoriaService;
 			AceptarButton.Enabled = false;
+
         }
 
         public void NewCliente()
@@ -36,12 +37,14 @@ namespace Desktop
         {
             CategoriaCombobox.DataSource = _categoriaService.GetCategorias().ToList();
             ClienteBindingSource.DataSource = _cliente;
-        }
+		}
 
         private void AceptarButton_Click(object sender, EventArgs e)
         {
-            _service.Repository.UpdateCliente(_cliente);
-			this.Close();
+			ClienteBindingSource.EndEdit();
+			_service.Repository.UpdateCliente(_cliente);
+			this.DialogResult = DialogResult.OK;
+            this.Close();
 
 		}
 
@@ -53,23 +56,22 @@ namespace Desktop
         private void TestButton_Click(object sender, EventArgs e)
         {
             ClienteService.UpdateNombre(_cliente);
-			ActualizarEstadoBoton();
+			AceptarButton.Enabled = true;
 		}
 		private void ActualizarEstadoBoton()
 		{
-			bool huboCambios = false;
-
-			if (NombreTextBox.Text != _cliente.Nombre) huboCambios = true;
-			if (DireccionTextBox.Text != _cliente.Direccion) huboCambios = true;
-			if (EmailTextBox.Text != _cliente.Email) huboCambios = true;
-			if (TelefonoTextBox.Text != _cliente.Telefono) huboCambios = true;
-
-			if (CategoriaCombobox.SelectedValue != null)
+			int idSeleccionado = 0;
+			if (CategoriaCombobox.SelectedValue != null && CategoriaCombobox.SelectedValue is int)
 			{
-				int idSeleccionado = (int)CategoriaCombobox.SelectedValue;
-				if (idSeleccionado != _cliente.Categoria) huboCambios = true;
+				idSeleccionado = (int)CategoriaCombobox.SelectedValue;
 			}
-			AceptarButton.Enabled = huboCambios;
+			AceptarButton.Enabled = _service.HanCambiadoLosDatos(
+		                                                _cliente,
+		                                                NombreTextBox.Text,
+		                                                DireccionTextBox.Text,
+		                                                EmailTextBox.Text,
+		                                                TelefonoTextBox.Text,
+		                                                idSeleccionado);
 		}
 
 		private void CategoriaCombobox_SelectedIndexChanged(object sender, EventArgs e)

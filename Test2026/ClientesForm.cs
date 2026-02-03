@@ -74,9 +74,73 @@ namespace Test2026
             LoadDataSource();
         }
 
-        private void ClientesGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void PremiumCheckBox_MouseHover(object sender, EventArgs e)
         {
+            toolTip1.SetToolTip(this.PremiumCheckBox, "Filtra por los clientes con premium");
+        }
+
+        private void InsertarButton_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(this.InsertarButton, "Insertar un nuevo cliente");
+        }
+
+        private void ResetButton_MouseHover(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(this.ResetButton, "Resetea los filtros de la lista");
+        }
+
+        private void FiltrarButton_MouseHover(object sender, EventArgs e)
+        {
+            string text = "Filtra por el texto introducido";
+
+            toolTip1.SetToolTip(this.label2, text);
+            toolTip1.SetToolTip(this.FiltrarTextBox, text);
+            toolTip1.SetToolTip(this.FiltrarButton, text);
 
         }
+
+		private void PremiumCheckBox_CheckedChanged(object sender, EventArgs e)
+		{
+			var todosClientes = _service.Repository.GetAllClientes().ToList();
+
+			if (PremiumCheckBox.Checked)
+			{
+				var clientesPremium = todosClientes.Where(c => c.Categoria == 2).ToList();
+				ClientesBindingSource.DataSource = clientesPremium;
+			}
+			else
+			{
+				ClientesBindingSource.DataSource = todosClientes;
+			}
+		}
+		private void ClientesStandarCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+			var todosClientes = _service.Repository.GetAllClientes().ToList();
+
+			if (ClientesPruebaCheckBox.Checked)
+			{
+				var clientesStandard = todosClientes.Where(c => c.Categoria == 1).ToList();
+				ClientesBindingSource.DataSource = clientesStandard;
+			}
+			else
+			{
+				ClientesBindingSource.DataSource = todosClientes;
+			}
+		}
+
+        private void ClientePruebaCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+			var todosClientes = _service.Repository.GetAllClientes().ToList();
+
+			if (ClientesPruebaCheckBox.Checked)
+			{
+				var clientesPrueba = todosClientes.Where(c => c.Categoria == 3).ToList();
+				ClientesBindingSource.DataSource = clientesPrueba;
+			}
+			else
+			{
+				ClientesBindingSource.DataSource = todosClientes;
+			}
+		}
     }
 }
