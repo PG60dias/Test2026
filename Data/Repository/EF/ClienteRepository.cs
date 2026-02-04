@@ -15,7 +15,7 @@ namespace Data.Repository.EF
 
         public IEnumerable<Cliente> GetAllClientes()
         {
-            return [.. context.Clientes.AsNoTracking()//Importante para referescar el grid
+            return [.. context.Clientes.AsNoTracking()//Importante
                                 .Include(c => c.CategoriaNavigation).ToList()];
         }   
 

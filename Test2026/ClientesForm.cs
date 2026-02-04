@@ -63,7 +63,35 @@ namespace Test2026
             LoadDataSource();
         }
 
-        private void InsertarButton_Click(object sender, EventArgs e)
+
+		private void subirCategoríaToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			int idcliente = int.Parse(ClientesGridView.CurrentRow.Cells[0].Value.ToString());
+			var cliente = _service.Repository.GetCliente(idcliente);
+
+			if (cliente != null)
+			{
+				bool cambio = false;
+
+				if (cliente.Categoria == 3) 
+				{
+					cliente.Categoria = 1;
+					cambio = true;
+				}
+				else if (cliente.Categoria == 1)
+				{
+					cliente.Categoria = 2;
+					cambio = true;
+				}
+				if (cambio)
+				{
+					_service.Repository.UpdateCliente(cliente);
+					LoadDataSource();
+				}
+			}
+		}
+
+		private void InsertarButton_Click(object sender, EventArgs e)
         {
             using var scope = _serviceProvider.CreateScope();
             var form = scope.ServiceProvider.GetRequiredService<ClientesInsertForm>();
@@ -97,7 +125,7 @@ namespace Test2026
 
         }
 
-		private void ClientesPremiumCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void ClientesPremiumCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             AplicarFiltros();
         }
@@ -111,21 +139,21 @@ namespace Test2026
             AplicarFiltros();
         }
 
-		private void AplicarFiltros()
-		{
-			var seleccionados = new List<int>();
-			if (PremiumCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Premium);
-			if (ClientesStandardCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Standard);
-			if (ClientesPruebaCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Prueba);
+        private void AplicarFiltros()
+        {
+            var seleccionados = new List<int>();
+            if (PremiumCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Premium);
+            if (ClientesStandardCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Standard);
+            if (ClientesPruebaCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Prueba);
 
-			List<int> filtroCategorias = seleccionados.Any() ? seleccionados : null;
+            List<int> filtroCategorias = seleccionados.Any() ? seleccionados : null;
 
-			var resultado = _service.GetClientesFiltrados(filtroCategorias, FiltrarTextBox.Text);
+            var resultado = _service.GetClientesFiltrados(filtroCategorias, FiltrarTextBox.Text);
 
-			_clientesBindingList = new BindingList<Cliente>(resultado.ToList());
-			ClientesBindingSource.DataSource = _clientesBindingList;
-		}
+            _clientesBindingList = new BindingList<Cliente>(resultado.ToList());
+            ClientesBindingSource.DataSource = _clientesBindingList;
+        }
 
 
-	}
+    }
 }

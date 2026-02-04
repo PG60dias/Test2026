@@ -13,14 +13,6 @@ namespace Domain.Services
         {
             cliente.Nombre = cliente.Nombre.ToUpper();
         }
-
-		//public IEnumerable<Cliente> FiltrarClientes(string texto)
-		//{
-		//	if (string.IsNullOrWhiteSpace(texto))
-		//		return Repository.GetAllClientes();
-
-		//	return Repository.GetClientesFiltrados(texto);
-		//}
 		public bool HanCambiadoLosDatos(Cliente original, string nombre, string direccion, string email, string telefono, int categoriaId)
 		{
 			return original.Nombre != nombre ||

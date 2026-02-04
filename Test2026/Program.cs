@@ -6,7 +6,8 @@ namespace Test2026
     using Microsoft.EntityFrameworkCore;
     using Domain.Services;
     using Data.Repository.Common;
-    using Data.Repository.EF;
+	//using Data.Repository.Local;
+	using Data.Repository.EF;
 	using Desktop;
 
     internal static class Program

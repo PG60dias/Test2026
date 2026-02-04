@@ -41,6 +41,7 @@
             Categoria = new DataGridViewTextBoxColumn();
             contextMenuStrip1 = new ContextMenuStrip(components);
             Borrar = new ToolStripMenuItem();
+            subirCategoríaToolStripMenuItem = new ToolStripMenuItem();
             ClientesBindingSource = new BindingSource(components);
             categoriaBindingSource = new BindingSource(components);
             label1 = new Label();
@@ -154,16 +155,23 @@
             // 
             // contextMenuStrip1
             // 
-            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { Borrar });
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { Borrar, subirCategoríaToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(107, 26);
+            contextMenuStrip1.Size = new Size(156, 48);
             // 
             // Borrar
             // 
             Borrar.Name = "Borrar";
-            Borrar.Size = new Size(106, 22);
+            Borrar.Size = new Size(155, 22);
             Borrar.Text = "Borrar";
             Borrar.Click += Borrar_Click;
+            // 
+            // subirCategoríaToolStripMenuItem
+            // 
+            subirCategoríaToolStripMenuItem.Name = "subirCategoríaToolStripMenuItem";
+            subirCategoríaToolStripMenuItem.Size = new Size(155, 22);
+            subirCategoríaToolStripMenuItem.Text = "Subir Categoría";
+            subirCategoríaToolStripMenuItem.Click += subirCategoríaToolStripMenuItem_Click;
             // 
             // ClientesBindingSource
             // 
@@ -252,7 +260,8 @@
             PremiumCheckBox.TabIndex = 7;
             PremiumCheckBox.Text = "Clientes Premium";
             PremiumCheckBox.UseVisualStyleBackColor = true;
-            PremiumCheckBox.CheckedChanged += PremiumCheckBox_MouseHover;
+            PremiumCheckBox.CheckedChanged += ClientesPremiumCheckBox_CheckedChanged;
+            PremiumCheckBox.MouseHover += PremiumCheckBox_MouseHover;
             // 
             // ClientesStandardCheckBox
             // 
@@ -330,5 +339,6 @@
         private ToolTip toolTip1;
         private CheckBox ClientesStandardCheckBox;
         private CheckBox ClientesPruebaCheckBox;
+        private ToolStripMenuItem subirCategoríaToolStripMenuItem;
     }
 }
