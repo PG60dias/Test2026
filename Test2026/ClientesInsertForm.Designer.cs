@@ -85,7 +85,7 @@
             // 
             // clienteBindingSource
             // 
-            clienteBindingSource.DataSource = typeof(Data.DTOs.ClienteDTO);
+            clienteBindingSource.DataSource = typeof(Data.Modelo.Cliente);
             // 
             // categoriaBindingSource
             // 

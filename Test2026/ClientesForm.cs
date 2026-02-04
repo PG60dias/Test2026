@@ -37,7 +37,7 @@ namespace Test2026
             {
                 using var scope = _serviceProvider.CreateScope();
                 var form = scope.ServiceProvider.GetRequiredService<ClientesEditForm>();
-                form.EditCliente(cliente.Id);
+                form.EditCliente(cliente);
                 form.ShowDialog();
                 LoadDataSource();
             }

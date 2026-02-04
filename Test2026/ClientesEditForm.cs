@@ -26,10 +26,11 @@ namespace Desktop
             _cliente = new Cliente();
         }
 
-        public void EditCliente(int idCliente)
+        public void EditCliente(Cliente ClienteOriginal)
         {
-            this.Text = "Editar Cliente";
-            _cliente = _service.Repository.GetCliente(idCliente);
+			this.Text = "Editar Cliente";
+			_cliente = ClienteOriginal;
+		
         }
 
 
