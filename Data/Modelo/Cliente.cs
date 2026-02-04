@@ -35,4 +35,5 @@ public partial class Cliente
     [ForeignKey("Categoria")]
     public virtual Categoria? CategoriaNavigation { get; set; }
 
+
 }

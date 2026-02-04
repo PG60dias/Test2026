@@ -14,13 +14,13 @@ namespace Domain.Services
             cliente.Nombre = cliente.Nombre.ToUpper();
         }
 
-		public IEnumerable<Cliente> FiltrarClientes(string texto)
-		{
-			if (string.IsNullOrWhiteSpace(texto))
-				return Repository.GetAllClientes();
+		//public IEnumerable<Cliente> FiltrarClientes(string texto)
+		//{
+		//	if (string.IsNullOrWhiteSpace(texto))
+		//		return Repository.GetAllClientes();
 
-			return Repository.GetClientesFiltrados(texto);
-		}
+		//	return Repository.GetClientesFiltrados(texto);
+		//}
 		public bool HanCambiadoLosDatos(Cliente original, string nombre, string direccion, string email, string telefono, int categoriaId)
 		{
 			return original.Nombre != nombre ||
@@ -28,6 +28,11 @@ namespace Domain.Services
 				   original.Email != email ||
 				   original.Telefono != telefono ||
 				   original.Categoria != categoriaId;
+		}
+
+		public IEnumerable<Cliente> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
+		{
+			return Repository.GetClientesFiltrados(categoriaIds, busqueda?.Trim());
 		}
 	}
 }

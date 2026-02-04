@@ -40,18 +40,30 @@ namespace Data.Repository.EF
             }
         }
 
-		public IEnumerable<Cliente> GetClientesFiltrados(string filtro)
+		public IEnumerable<Cliente> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
 		{
-			bool esNumero = int.TryParse(filtro, out int id);
+			var query = context.Clientes.Include(c => c.CategoriaNavigation).AsQueryable();
 
-			return context.Clientes
-				.Include(c => c.CategoriaNavigation)
-				.Where(c => (esNumero && c.Id == id) ||
-							(c.Nombre != null && c.Nombre.Contains(filtro)) ||
-							(c.Direccion != null && c.Direccion.Contains(filtro)) ||
-							(c.Email != null && c.Email.Contains(filtro)) ||
-							(c.Telefono != null && c.Telefono.Contains(filtro)))
-				.ToList();
+			if (categoriaIds != null && categoriaIds.Any())
+			{
+				query = query.Where(c => categoriaIds.Contains(c.Categoria ?? 0));
+			}
+
+			if (!string.IsNullOrWhiteSpace(busqueda))
+			{
+				string b = busqueda.ToLower();
+
+				query = query.Where(c =>
+					c.Id.ToString().Contains(b) ||
+					(c.Nombre != null && c.Nombre.ToLower().Contains(b)) ||
+					(c.Email != null && c.Email.ToLower().Contains(b)) ||
+					(c.Telefono != null && c.Telefono.Contains(b)) ||
+					(c.Direccion != null && c.Direccion.ToLower().Contains(b))
+				);
+			}
+
+			return query.ToList();
 		}
+
 	}
 }

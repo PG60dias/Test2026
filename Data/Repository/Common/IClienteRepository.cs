@@ -9,7 +9,7 @@ namespace Data.Repository.Common
         void AddCliente(Cliente cliente);
         void UpdateCliente(Cliente cliente);
         void DeleteCliente(int id);
-		IEnumerable<Cliente> GetClientesFiltrados(string filtro);
+		IEnumerable<Cliente> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null);
 
 	}
 }

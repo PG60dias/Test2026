@@ -45,10 +45,7 @@ namespace Test2026
 
         private void FiltrarButton_Click(object sender, EventArgs e)
         {
-            var filtrados = _service.Repository.GetClientesFiltrados(FiltrarTextBox.Text);
-            _clientesBindingList = new BindingList<Cliente>(filtrados.ToList());
-            ClientesBindingSource.DataSource = _clientesBindingList;
-            ClientesGridView.Refresh();
+            AplicarFiltros();
 
         }
 
@@ -114,25 +111,21 @@ namespace Test2026
             AplicarFiltros();
         }
 
-        private void AplicarFiltros()
-        {
-            var clientes = _service.Repository.GetAllClientes().AsEnumerable();
+		private void AplicarFiltros()
+		{
+			var seleccionados = new List<int>();
+			if (PremiumCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Premium);
+			if (ClientesStandardCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Standard);
+			if (ClientesPruebaCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Prueba);
 
-            List<int> categoriasSeleccionadas = new List<int>();
+			List<int> filtroCategorias = seleccionados.Any() ? seleccionados : null;
 
-            if (PremiumCheckBox.Checked) categoriasSeleccionadas.Add(2);
-            if (ClientesStandardCheckBox.Checked) categoriasSeleccionadas.Add(1);
-            if (ClientesPruebaCheckBox.Checked) categoriasSeleccionadas.Add(3);
+			var resultado = _service.GetClientesFiltrados(filtroCategorias, FiltrarTextBox.Text);
 
-            if (categoriasSeleccionadas.Any())
-            {
-                clientes = clientes.Where(c => categoriasSeleccionadas.Contains(c.Categoria ?? 0));
-            }
-
-            _clientesBindingList = new BindingList<Cliente>(clientes.ToList());
-            ClientesBindingSource.DataSource = _clientesBindingList;
-        }
+			_clientesBindingList = new BindingList<Cliente>(resultado.ToList());
+			ClientesBindingSource.DataSource = _clientesBindingList;
+		}
 
 
-    }
+	}
 }

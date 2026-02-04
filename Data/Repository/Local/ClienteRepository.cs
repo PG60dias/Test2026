@@ -46,7 +46,7 @@ namespace Data.Repository.Local
             _clientes.Remove(c);
         }
 
-        public IEnumerable<Cliente> GetClientesFiltrados(string filtro)
+        public IEnumerable<Cliente> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
         {
             throw new NotImplementedException();
         }
