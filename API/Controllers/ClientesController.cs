@@ -16,10 +16,34 @@ namespace API.Controllers
             _service = service;
         }
 
-	    [HttpGet(Name = "Clientes")]
+	    [HttpGet]
         public IEnumerable<Cliente> Get()
         {
 			return _service.Repository.GetAllClientes();
 		}
-    }
+
+		[HttpGet("{id}")]
+		public ActionResult<Cliente> Get(int id)
+		{
+			var cliente = _service.Repository.GetCliente(id);
+			return Ok(cliente);
+		}
+
+		[HttpPost]
+		public ActionResult <Cliente> Post([FromBody] Cliente cliente)
+		{
+			_service.Repository.AddCliente(cliente);
+
+            return CreatedAtAction(nameof(Get), new { id = cliente.Id }, cliente);
+		}
+
+		[HttpDelete]
+		public ActionResult Delete([FromBody] Cliente body)
+		{
+			int id = body.Id;
+			_service.Repository.DeleteCliente(id);
+			return NoContent();
+		}
+
+	}
 }
