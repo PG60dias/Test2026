@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Linq;
+using Data.DTOs;
 using Data.Modelo;
 using Desktop;
 using Domain.Services;
@@ -12,7 +13,7 @@ namespace Test2026
     {
         private readonly ClienteService _service;
         private readonly IServiceProvider _serviceProvider;
-        private BindingList<Cliente> _clientesBindingList;
+        private BindingList<ClienteDTO> _clientesBindingList;
 
         public ClientesForm(ClienteService service, IServiceProvider serviceProvider)
         {
@@ -34,7 +35,7 @@ namespace Test2026
 
         private void ClientesGridView_DoubleClick(object sender, EventArgs e)
         {
-            if (ClientesGridView.CurrentRow.DataBoundItem is Cliente cliente)
+            if (ClientesGridView.CurrentRow.DataBoundItem is ClienteDTO cliente)
             {
                 using var scope = _serviceProvider.CreateScope();
                 var form = scope.ServiceProvider.GetRequiredService<ClientesEditForm>();
@@ -154,7 +155,7 @@ namespace Test2026
 
             var resultado = _service.GetClientesFiltrados(filtroCategorias, FiltrarTextBox.Text);
 
-            _clientesBindingList = new BindingList<Cliente>(resultado.ToList());
+            _clientesBindingList = new BindingList<ClienteDTO>(resultado.ToList());
             ClientesBindingSource.DataSource = _clientesBindingList;
         }
 

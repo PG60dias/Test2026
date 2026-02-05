@@ -1,4 +1,4 @@
-using Data.Modelo;
+using Data.DTOs;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,20 +17,20 @@ namespace API.Controllers
         }
 
 	    [HttpGet]
-        public IEnumerable<Cliente> Get()
+        public IEnumerable<ClienteDTO> Get()
         {
 			return _service.Repository.GetAllClientes();
 		}
 
 		[HttpGet("{id}")]
-		public ActionResult<Cliente> Get(int id)
+		public ActionResult<ClienteDTO> Get(int id)
 		{
 			var cliente = _service.Repository.GetCliente(id);
 			return Ok(cliente);
 		}
 
 		[HttpPost]
-		public ActionResult <Cliente> Post([FromBody] Cliente cliente)
+		public ActionResult <ClienteDTO> Post([FromBody] ClienteDTO cliente)
 		{
 			_service.Repository.AddCliente(cliente);
 
@@ -45,7 +45,7 @@ namespace API.Controllers
 		}
 
 		[HttpPut("{id}")]
-		public ActionResult Put(int id, [FromBody] Cliente cliente)
+		public ActionResult Put(int id, [FromBody] ClienteDTO cliente)
 		{
 			if (id != cliente.Id)
 				return BadRequest("El ID del cliente no coincide con el del cuerpo.");

@@ -8,13 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Data.Modelo;
+using Data.DTOs;
 using Domain.Services;
 
 namespace Desktop
 {
     public partial class ClientesInsertForm : Form
     {
-        private Cliente _nuevoCliente;
+        private ClienteDTO _nuevoCliente;
         private readonly ClienteService _service;
         private readonly CategoriaService _categoriaService;
 
@@ -23,13 +24,13 @@ namespace Desktop
             InitializeComponent();
             _service = service;
             _categoriaService = categoriaService;
-            _nuevoCliente = new Cliente();
+            _nuevoCliente = new ClienteDTO();
         }
 
         public void InsertCliente()
         {
             this.Text = "Insertar Nuevo Cliente";
-            _nuevoCliente = new Cliente();
+            _nuevoCliente = new ClienteDTO();
         }
 
         private void ClientesInsertForm_Load(object sender, EventArgs e)

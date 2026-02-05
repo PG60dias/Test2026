@@ -1,4 +1,4 @@
-﻿using Data.Modelo;
+﻿using Data.DTOs;
 using Data.Repository.Common;
 
 
@@ -9,11 +9,11 @@ namespace Domain.Services
 
         public IClienteRepository Repository = repository;
 
-        public static void UpdateNombre(Cliente cliente)
+        public static void UpdateNombre(ClienteDTO cliente)
         {
             cliente.Nombre = cliente.Nombre.ToUpper();
         }
-		public bool HanCambiadoLosDatos(Cliente original, string nombre, string direccion, string email, string telefono, int categoriaId)
+		public bool HanCambiadoLosDatos(ClienteDTO original, string nombre, string direccion, string email, string telefono, int categoriaId)
 		{
 			return original.Nombre != nombre ||
 				   original.Direccion != direccion ||
@@ -22,7 +22,7 @@ namespace Domain.Services
 				   original.Categoria != categoriaId;
 		}
 
-		public IEnumerable<Cliente> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
+		public IEnumerable<ClienteDTO> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
 		{
 			return Repository.GetClientesFiltrados(categoriaIds, busqueda?.Trim());
 		}

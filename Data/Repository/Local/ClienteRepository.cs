@@ -1,4 +1,5 @@
-﻿using Data.Modelo;
+﻿using Data.DTOs;
+using Data.Modelo;
 using Data.Repository.Common;
 using System.Collections.ObjectModel;
 
@@ -13,51 +14,81 @@ namespace Data.Repository.Local
 			new Cliente { Id = 3, Nombre = "Cliente Tres", Email = "tres@test.com", Direccion = "Calle 3", Telefono = "333", Categoria = 3 }
 		];
 
-		public Cliente? GetCliente(int id)
+		private static ClienteDTO MapToDto(Cliente c)
 		{
-			return _clientes.FirstOrDefault(c => c.Id == id);
-		}
-
-		public IEnumerable<Cliente> GetAllClientes()
-		{
-			return [.. _clientes];
-		}
-
-		public void AddCliente(Cliente cliente)
-		{
-			if (_clientes.Count > 0)
-				cliente.Id = _clientes.Max(c => c.Id) + 1;
-			else
-				cliente.Id = 1;
-
-			_clientes.Add(cliente);
-		}
-
-		public void UpdateCliente(Cliente cliente)
-		{
-			var c = GetCliente(cliente.Id);
-			if (c != null)
+			return new ClienteDTO
 			{
-				c.Nombre = cliente.Nombre;
-				c.Email = cliente.Email;
-				c.Direccion = cliente.Direccion;
-				c.Telefono = cliente.Telefono;
-				c.Categoria = cliente.Categoria;
+				Id = c.Id,
+				Nombre = c.Nombre,
+				Direccion = c.Direccion,
+				Email = c.Email,
+				Telefono = c.Telefono,
+				Categoria = c.Categoria,
+				CategoriaNombre = c.Categoria switch
+				{
+					1 => "Standard",
+					2 => "Premium",
+					3 => "Prueba",
+					_ => "Sin Categoría"
+				}
+			};
+		}
+
+		public ClienteDTO? GetCliente(int id)
+		{
+			var cliente = _clientes.FirstOrDefault(c => c.Id == id);
+			return cliente != null ? MapToDto(cliente) : null;
+		}
+
+		public IEnumerable<ClienteDTO> GetAllClientes()
+		{
+			return _clientes.Select(MapToDto).ToList();
+		}
+
+		public void AddCliente(ClienteDTO dto)
+		{
+			var nuevoCliente = new Cliente
+			{
+				Id = _clientes.Any() ? _clientes.Max(c => c.Id) + 1 : 1,
+				Nombre = dto.Nombre ?? "",
+				Email = dto.Email,
+				Direccion = dto.Direccion,
+				Telefono = dto.Telefono,
+				Categoria = dto.Categoria
+			};
+
+			_clientes.Add(nuevoCliente);
+
+
+			dto.Id = nuevoCliente.Id;
+		}
+
+		public void UpdateCliente(ClienteDTO dto)
+		{
+			var actual = _clientes.FirstOrDefault(c => c.Id == dto.Id);
+			if (actual != null)
+			{
+				actual.Nombre = dto.Nombre ?? "";
+				actual.Email = dto.Email;
+				actual.Direccion = dto.Direccion;
+				actual.Telefono = dto.Telefono;
+				actual.Categoria = dto.Categoria;
 			}
 		}
 
 		public void DeleteCliente(int id)
 		{
-			var c = GetCliente(id);
+			var c = _clientes.FirstOrDefault(x => x.Id == id);
 			if (c != null)
 			{
 				_clientes.Remove(c);
 			}
 		}
 
-		public IEnumerable<Cliente> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
+		public IEnumerable<ClienteDTO> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
 		{
 			var query = _clientes.AsEnumerable();
+
 
 			if (categoriaIds != null && categoriaIds.Any())
 			{
@@ -76,7 +107,7 @@ namespace Data.Repository.Local
 				);
 			}
 
-			return query.ToList();
+			return query.Select(MapToDto).ToList();
 		}
 	}
 }

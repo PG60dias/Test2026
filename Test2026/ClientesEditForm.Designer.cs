@@ -55,7 +55,7 @@
             // 
             // ClienteBindingSource
             // 
-            ClienteBindingSource.DataSource = typeof(Data.Modelo.Cliente);
+            ClienteBindingSource.DataSource = typeof(Data.DTOs.ClienteDTO);
             // 
             // NombreTextBox
             // 

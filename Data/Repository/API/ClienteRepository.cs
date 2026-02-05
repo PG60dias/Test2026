@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Data.Modelo;
+using Data.DTOs;
 using Data.Repository.Common;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -13,7 +13,7 @@ namespace Data.Repository.API
 		private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions() 
 																				{ PropertyNameCaseInsensitive = true };
 
-		public void AddCliente(Cliente cliente)
+		public void AddCliente(ClienteDTO cliente)
         {
 			var json = JsonSerializer.Serialize(cliente, _jsonSerializerOptions);
 			var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
@@ -31,28 +31,28 @@ namespace Data.Repository.API
 
 		}
 
-        public IEnumerable<Cliente> GetAllClientes()
+        public IEnumerable<ClienteDTO> GetAllClientes()
         {
 			var request = new HttpRequestMessage(HttpMethod.Get, API_ENDPOINT + "Clientes");
 			var response = _httpClient.Send(request);
 			response.EnsureSuccessStatusCode();
 			var json = Task.Run(() => response.Content.ReadAsStringAsync()).GetAwaiter().GetResult();
 
-            return JsonSerializer.Deserialize<IEnumerable<Cliente>>(json, _jsonSerializerOptions);
+            return JsonSerializer.Deserialize<IEnumerable<ClienteDTO>>(json, _jsonSerializerOptions);
 
 		}
 
-		public Cliente? GetCliente(int id)
+		public ClienteDTO? GetCliente(int id)
         {
 			var request = new HttpRequestMessage(HttpMethod.Get, API_ENDPOINT + "Clientes/" + id);
 			var response = _httpClient.Send(request);
 			response.EnsureSuccessStatusCode();
 			var json = Task.Run(() => response.Content.ReadAsStringAsync()).GetAwaiter().GetResult();
 
-			return JsonSerializer.Deserialize<Cliente>(json, _jsonSerializerOptions);
+			return JsonSerializer.Deserialize<ClienteDTO>(json, _jsonSerializerOptions);
 		}
 
-        public IEnumerable<Cliente> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
+        public IEnumerable<ClienteDTO> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
         {
 
 			var consulta = GetAllClientes().AsQueryable();
@@ -78,7 +78,7 @@ namespace Data.Repository.API
 			return consulta.ToList();
 		}
 
-		public void UpdateCliente(Cliente cliente)
+		public void UpdateCliente(ClienteDTO cliente)
 		{
 			var json = JsonSerializer.Serialize(cliente, _jsonSerializerOptions);
 			var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
