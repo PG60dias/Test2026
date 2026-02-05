@@ -54,6 +54,9 @@ namespace Test2026
         private void ResetButton_Click(object sender, EventArgs e)
         {
             FiltrarTextBox.Text = "";
+            PremiumCheckBox.Checked = false;
+            ClientesStandardCheckBox.Checked = false;
+            ClientesPruebaCheckBox.Checked = false;
             LoadDataSource();
         }
 

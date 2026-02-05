@@ -80,7 +80,7 @@ namespace Data.Repository.API
 
 		public void UpdateCliente(Cliente cliente)
 		{
-			var json = JsonSerializer.Serialize(cliente);
+			var json = JsonSerializer.Serialize(cliente, _jsonSerializerOptions);
 			var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 			var request = new HttpRequestMessage(HttpMethod.Put, API_ENDPOINT + "Clientes/" + cliente.Id);
 			request.Content = content;
