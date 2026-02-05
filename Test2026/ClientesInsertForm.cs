@@ -38,16 +38,26 @@ namespace Desktop
 
             clienteBindingSource.DataSource = _nuevoCliente;
         }
+
         private void AceptarButton_Click(object sender, EventArgs e)
         {
 			clienteBindingSource.EndEdit();
-			_service.Repository.AddCliente(_nuevoCliente);
 
-			this.DialogResult = DialogResult.OK;
+			try
+			{
+				_service.Repository.AddCliente(_nuevoCliente);
+
+				MessageBox.Show("Guardado correctamente");
+				this.DialogResult = DialogResult.OK;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Error al guardar: " + ex.Message);
+			}
 			this.Close();
 		}
 
-        private void CancelarButton_Click_1(object sender, EventArgs e)
+		private void CancelarButton_Click_1(object sender, EventArgs e)
         {
             this.Close();
         }

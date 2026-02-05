@@ -93,6 +93,7 @@
             // 
             // TelefonoTextBox
             // 
+            TelefonoTextBox.DataBindings.Add(new Binding("Text", clienteBindingSource, "Telefono", true));
             TelefonoTextBox.Location = new Point(182, 163);
             TelefonoTextBox.Name = "TelefonoTextBox";
             TelefonoTextBox.Size = new Size(156, 23);
@@ -109,6 +110,7 @@
             // 
             // EmailTextBox
             // 
+            EmailTextBox.DataBindings.Add(new Binding("Text", clienteBindingSource, "Email", true));
             EmailTextBox.Location = new Point(182, 134);
             EmailTextBox.Name = "EmailTextBox";
             EmailTextBox.Size = new Size(156, 23);
@@ -125,6 +127,7 @@
             // 
             // DireccionTextBox
             // 
+            DireccionTextBox.DataBindings.Add(new Binding("Text", clienteBindingSource, "Direccion", true));
             DireccionTextBox.Location = new Point(182, 105);
             DireccionTextBox.Name = "DireccionTextBox";
             DireccionTextBox.Size = new Size(156, 23);
@@ -141,6 +144,7 @@
             // 
             // NombreTextBox
             // 
+            NombreTextBox.DataBindings.Add(new Binding("Text", clienteBindingSource, "Nombre", true));
             NombreTextBox.Location = new Point(182, 76);
             NombreTextBox.Name = "NombreTextBox";
             NombreTextBox.Size = new Size(156, 23);
@@ -158,6 +162,7 @@
             // CategoriaCombobox
             // 
             CategoriaCombobox.DataBindings.Add(new Binding("SelectedValue", clienteBindingSource, "Categoria", true));
+            CategoriaCombobox.DataBindings.Add(new Binding("Text", clienteBindingSource, "Categoria", true));
             CategoriaCombobox.DataSource = categoriaBindingSource;
             CategoriaCombobox.DisplayMember = "Nombre";
             CategoriaCombobox.FormattingEnabled = true;

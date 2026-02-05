@@ -28,7 +28,7 @@ namespace Test2026
 						options.UseSqlServer("Server=localhost\\SQLEXPRESS;Initial Catalog=Test1;Persist Security Info=True;Trusted_Connection=True;TrustServerCertificate=True"));
 
 					services.AddScoped<IClienteRepository, ClienteRepository>();
-					//services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+					services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 					services.AddScoped<ClienteService>();
                     services.AddScoped<CategoriaService>();
                     services.AddScoped<ClientesForm>();
