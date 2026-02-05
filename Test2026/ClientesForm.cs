@@ -28,7 +28,8 @@ namespace Test2026
 
         private void LoadDataSource()
         {
-            ClientesBindingSource.DataSource = _service.Repository.GetAllClientes();
+            var ds = _service.Repository.GetAllClientes();
+            ClientesBindingSource.DataSource = ds;
         }
 
         private void ClientesGridView_DoubleClick(object sender, EventArgs e)

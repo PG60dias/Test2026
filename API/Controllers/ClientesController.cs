@@ -37,13 +37,34 @@ namespace API.Controllers
             return CreatedAtAction(nameof(Get), new { id = cliente.Id }, cliente);
 		}
 
-		[HttpDelete]
-		public ActionResult Delete([FromBody] Cliente body)
+		[HttpDelete("{id}")]
+		public ActionResult Delete(int id)
 		{
-			int id = body.Id;
 			_service.Repository.DeleteCliente(id);
 			return NoContent();
 		}
 
+		[HttpPut("{id}")]
+		public ActionResult Put(int id, [FromBody] Cliente cliente)
+		{
+			if (id != cliente.Id)
+				return BadRequest("El ID del cliente no coincide con el del cuerpo.");
+
+			var existente = _service.Repository.GetCliente(id);
+
+			if (existente == null)
+				return NotFound("Cliente no encontrado.");
+
+			existente.Nombre = cliente.Nombre;
+			existente.Direccion = cliente.Direccion;
+			existente.Email = cliente.Email;
+			existente.Telefono = cliente.Telefono;
+			existente.Categoria= cliente.Categoria;
+
+
+			_service.Repository.UpdateCliente(existente);
+
+			return NoContent();
+		}
 	}
 }
