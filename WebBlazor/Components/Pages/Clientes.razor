@@ -1,40 +1,60 @@
 ﻿@page "/clientes"
 @rendermode InteractiveServer
+@using Data.DTOs
+@using Data.Modelo
+@using Domain.Services
 @inject ClienteService ClienteService
-@inject NavigationManager NavigationManager
+@inject DialogService DialogService
 
 <PageTitle>Clientes</PageTitle>
 
-<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-my-4">
-	Listado de Clientes
-</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+    <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-m-0">Clientes</RadzenText>
+    <RadzenButton Text="Agregar Cliente" Icon="add_circle" Click="@AbrirDialogoAgregar" ButtonStyle="ButtonStyle.Primary" />
+</RadzenStack>
 
-@*BOTON AGREGAR*@
-<RadzenButton Click=@(args => NavigationManager.NavigateTo("/clientes/nuevo"))
-			  Text="Agregar Cliente"
-			  Icon="add_circle" />
-
-@*TABLA*@
-<RadzenDataGrid Data="@listaClientes" TItem="ClienteDTO" 
-                RowSelect="@(args => NavigationManager.NavigateTo($"/clientes/detalle/{args.Id}"))"
-                AllowPaging="true" PageSize="10" Style="cursor: pointer;">
-	<Columns>
-	<RadzenDataGridColumn TItem="ClienteDTO" Property="Id" Title="Id" />
-		<RadzenDataGridColumn TItem="ClienteDTO" Property="Nombre" Title="Nombre" />
-		<RadzenDataGridColumn TItem="ClienteDTO" Property="Email" Title="Email" />
-		<RadzenDataGridColumn TItem="ClienteDTO" Property="Telefono" Title="Teléfono" />
-		<RadzenDataGridColumn TItem="ClienteDTO" Property="Direccion" Title="Dirección" />
-		<RadzenDataGridColumn TItem="ClienteDTO" Property="CategoriaNombre" Title="Categoría" />
-	</Columns>
+<RadzenDataGrid Data="@clientes" TItem="ClienteDTO" RowSelect="@(args => AbrirDialogoEditar(args.Id))" AllowPaging="true" PageSize="10" Style="cursor:pointer">
+    <Columns>
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="Id" Title="ID" Width="80px" />
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="Nombre" Title="Nombre" />
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="Email" Title="Email" />
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="Telefono" Title="Teléfono" />
+    </Columns>
 </RadzenDataGrid>
-
-
+   
 
 @code {
+    private IEnumerable<ClienteDTO> clientes;
 
-	private IEnumerable<ClienteDTO>? listaClientes;
-	protected override async Task OnInitializedAsync()
-	{
-		listaClientes = ClienteService.GetClientesFiltrados();
-	}
+    protected override void OnInitialized() => CargarDatos();
+
+    private void CargarDatos()
+    {
+        clientes = ClienteService.GetClientesFiltrados();
+    }
+
+    private async Task AbrirDialogoAgregar()
+    {
+        var res = await DialogService.OpenAsync<ClienteFormDialog>("Nuevo Cliente",
+            new Dictionary<string, object> {
+                { "cliente", new Cliente() },
+                { "EsEdicion", false }
+            });
+
+        if (res == true) CargarDatos();
+    }
+
+    private async Task AbrirDialogoEditar(int id)
+    {
+        var clienteAEditar = ClienteService.Repository.GetCliente(id);
+
+        var res = await DialogService.OpenAsync<ClienteFormDialog>($"Editar Cliente #{id}",
+            new Dictionary<string, object> {
+                { "cliente", clienteAEditar },
+                { "EsEdicion", true }
+            });
+
+        if (res == true) CargarDatos();
+    }
+
 }

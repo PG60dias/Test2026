@@ -1,0 +1,44 @@
+﻿@using Data.DTOs
+@using Data.Modelo
+@using Domain.Services
+@inject ClienteService ClienteService
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="Cliente" Data="@cliente" Submit="@OnSubmit">
+    <RadzenStack Gap="1rem">
+        <RadzenFormField Text="Nombre">
+            <RadzenTextBox @bind-Value="@cliente.Nombre" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenFormField Text="Email">
+            <RadzenTextBox @bind-Value="@cliente.Email" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenFormField Text="Teléfono">
+            <RadzenTextBox @bind-Value="@cliente.Telefono" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.End" Class="rz-mt-4">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Text="Cancelar" Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter] public Cliente cliente { get; set; } = new Cliente();
+    [Parameter] public bool EsEdicion { get; set; } = false;
+
+    private void OnSubmit()
+    {
+        if (EsEdicion)
+        {
+            ClienteService.Repository.UpdateCliente(cliente);
+        }
+        else
+        {
+            ClienteService.Repository.AddCliente(cliente);
+        }
+        DialogService.Close(true);
+    }
+}

@@ -5,7 +5,6 @@ using WebBlazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// AÑADIR SERVICIOS
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddRadzenComponents();
@@ -13,6 +12,7 @@ builder.Services.AddScoped<ClienteService, ClienteService>();
 builder.Services.AddScoped<CategoriaService, CategoriaService>();
 builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
 builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
+builder.Services.AddScoped<DialogService>();
 
 var app = builder.Build();
 
