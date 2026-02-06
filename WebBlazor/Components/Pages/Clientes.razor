@@ -1,14 +1,40 @@
 ﻿@page "/clientes"
 @rendermode InteractiveServer
-@inject ClienteService clienteService
+@inject ClienteService ClienteService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Clientes</PageTitle>
 
-<h3>Clientes</h3>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-my-4">
+	Listado de Clientes
+</RadzenText>
+
+@*BOTON AGREGAR*@
+<RadzenButton Click=@(args => NavigationManager.NavigateTo("/clientes/nuevo"))
+			  Text="Agregar Cliente"
+			  Icon="add_circle" />
+
+@*TABLA*@
+<RadzenDataGrid Data="@listaClientes" TItem="ClienteDTO" 
+                RowSelect="@(args => NavigationManager.NavigateTo($"/clientes/detalle/{args.Id}"))"
+                AllowPaging="true" PageSize="10" Style="cursor: pointer;">
+	<Columns>
+	<RadzenDataGridColumn TItem="ClienteDTO" Property="Id" Title="Id" />
+		<RadzenDataGridColumn TItem="ClienteDTO" Property="Nombre" Title="Nombre" />
+		<RadzenDataGridColumn TItem="ClienteDTO" Property="Email" Title="Email" />
+		<RadzenDataGridColumn TItem="ClienteDTO" Property="Telefono" Title="Teléfono" />
+		<RadzenDataGridColumn TItem="ClienteDTO" Property="Direccion" Title="Dirección" />
+		<RadzenDataGridColumn TItem="ClienteDTO" Property="CategoriaNombre" Title="Categoría" />
+	</Columns>
+</RadzenDataGrid>
+
+
 
 @code {
+
+	private IEnumerable<ClienteDTO>? listaClientes;
 	protected override async Task OnInitializedAsync()
 	{
-		clienteService.Repository.GetAllClientes();
+		listaClientes = ClienteService.GetClientesFiltrados();
 	}
 }

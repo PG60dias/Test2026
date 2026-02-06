@@ -22,7 +22,6 @@ namespace Domain.Services
 				   original.Telefono != telefono ||
 				   original.Categoria != categoriaId;
 		}
-
 		public IEnumerable<ClienteDTO> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
 		{
 			return Repository.GetClientesFiltrados(categoriaIds, busqueda?.Trim());

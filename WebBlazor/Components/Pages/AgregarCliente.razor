@@ -1,0 +1,72 @@
+﻿@page "/clientes/nuevo"
+@rendermode InteractiveServer
+@using Data.DTOs
+@using Data.Modelo
+@using Domain.Services
+@inject ClienteService ClienteService
+@inject CategoriaService CategoriaService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Nuevo Cliente</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3">Nuevo Cliente</RadzenText>
+
+<RadzenTemplateForm TItem="ClienteDTO" Data=@nuevoClienteDTO Submit=@OnSubmit>
+    <RadzenStack Gap="1rem">
+
+        <RadzenFormField Text="Nombre">
+            <RadzenTextBox @bind-Value="@nuevoClienteDTO.Nombre" Name="Nombre" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenFormField Text="Email">
+            <RadzenTextBox @bind-Value="@nuevoClienteDTO.Email" Name="Email" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenFormField Text="Teléfono">
+            <RadzenTextBox @bind-Value="@nuevoClienteDTO.Telefono" Name="Telefono" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenFormField Text="Dirección">
+            <RadzenTextBox @bind-Value="@nuevoClienteDTO.Direccion" Name="Direccion" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenFormField Text="Categoría">
+            <RadzenDropDown @bind-Value="@nuevoClienteDTO.Categoria"
+                            Data="@categorias"
+                            TextProperty="Nombre"
+                            ValueProperty="Id"
+                            AllowClear="true"
+                            Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Icon="cancel" Click=@(args => NavigationManager.NavigateTo("/clientes")) />
+        </RadzenStack>
+
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    private ClienteDTO nuevoClienteDTO = new ClienteDTO();
+    private IEnumerable<Categoria>? categorias;
+
+    protected override void OnInitialized()
+    {
+        categorias = CategoriaService.GetCategorias();
+    }
+
+    private void OnSubmit(ClienteDTO dto)
+    {
+        var clienteGuardar = new Cliente
+        {
+            Nombre = dto.Nombre,
+            Email = dto.Email,
+            Telefono = dto.Telefono,
+            Direccion = dto.Direccion,
+            Categoria = dto.Categoria
+        };
+        ClienteService.Repository.AddCliente(clienteGuardar);
+        NavigationManager.NavigateTo("/clientes");
+    }
+}

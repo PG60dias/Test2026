@@ -1,13 +1,18 @@
-using WebBlazor.Components;
+using Data.Repository.Common;
 using Domain.Services;
+using Radzen;
+using WebBlazor.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// AÑADIR SERVICIOS
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
+builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<ClienteService, ClienteService>();
+builder.Services.AddScoped<CategoriaService, CategoriaService>();
+builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
+builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
 
 var app = builder.Build();
 
