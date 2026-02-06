@@ -2,12 +2,17 @@
 @using Data.Modelo
 @using Domain.Services
 @inject ClienteService ClienteService
+@inject CategoriaService CategoriaService
 @inject DialogService DialogService
 
 <RadzenTemplateForm TItem="Cliente" Data="@cliente" Submit="@OnSubmit">
     <RadzenStack Gap="1rem">
         <RadzenFormField Text="Nombre">
             <RadzenTextBox @bind-Value="@cliente.Nombre" Style="width: 100%;" />
+        </RadzenFormField>
+
+        <RadzenFormField Text="Dirección">
+            <RadzenTextBox @bind-Value="@cliente.Direccion" Style="width: 100%;" />
         </RadzenFormField>
 
         <RadzenFormField Text="Email">
@@ -18,9 +23,20 @@
             <RadzenTextBox @bind-Value="@cliente.Telefono" Style="width: 100%;" />
         </RadzenFormField>
 
+        <RadzenFormField Text="Categoría">
+            <RadzenDropDown @bind-Value="@cliente.Categoria"
+                            Data="@listaCategorias"
+                            TextProperty="Nombre"
+                            ValueProperty="Id"
+                            Style="width: 100%;"
+                            Placeholder="Seleccione una categoría"
+                            Name="Categoria" />
+        </RadzenFormField>
+
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.End" Class="rz-mt-4">
-            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
             <RadzenButton Text="Cancelar" Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" />
+            <RadzenButton Text="Eliminar" Click="@Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
         </RadzenStack>
     </RadzenStack>
 </RadzenTemplateForm>
@@ -29,16 +45,21 @@
     [Parameter] public Cliente cliente { get; set; } = new Cliente();
     [Parameter] public bool EsEdicion { get; set; } = false;
 
+    private IEnumerable<Categoria> listaCategorias;
+    protected override void OnInitialized()
+    {
+        listaCategorias = CategoriaService.GetCategorias();
+    }
+
     private void OnSubmit()
     {
-        if (EsEdicion)
-        {
-            ClienteService.Repository.UpdateCliente(cliente);
-        }
-        else
-        {
-            ClienteService.Repository.AddCliente(cliente);
-        }
+        ClienteService.Repository.AddCliente(cliente);
+        DialogService.Close(true);
+    }
+
+    private void Delete()
+    {
+        ClienteService.Repository.DeleteCliente(cliente.Id);
         DialogService.Close(true);
     }
 }

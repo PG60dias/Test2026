@@ -4,41 +4,172 @@
 @using Data.Modelo
 @using Domain.Services
 @inject ClienteService ClienteService
+@inject CategoriaService CategoriaService
 @inject DialogService DialogService
-
+ 
 <PageTitle>Clientes</PageTitle>
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
     <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-m-0">Clientes</RadzenText>
-    <RadzenButton Text="Agregar Cliente" Icon="add_circle" Click="@AbrirDialogoAgregar" ButtonStyle="ButtonStyle.Primary" />
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
+        <RadzenButton Text="@($"Borrar {(selectedClientes?.Count ?? 0)} clientes")"
+                      Icon="delete"
+                      Size="ButtonSize.Small"
+                      ButtonStyle="ButtonStyle.Danger"
+                      Click="@EliminarClientesSeleccionados"
+                      Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
+
+        <RadzenButton Text="Agregar"
+                      Icon="add_circle"
+                      Size="ButtonSize.Small"
+                      Click="@AbrirDialogoAgregar"
+                      ButtonStyle="ButtonStyle.Primary" />
+        <RadzenButton Text="Subir Categoría"
+                      Icon="open_in_browser"
+                      Size="ButtonSize.Small"
+                      Click="@MejoraCategoria"
+                      ButtonStyle="ButtonStyle.Secondary" />
+    </RadzenStack>
+
 </RadzenStack>
 
-<RadzenDataGrid Data="@clientes" TItem="ClienteDTO" RowSelect="@(args => AbrirDialogoEditar(args.Id))" AllowPaging="true" PageSize="10" Style="cursor:pointer">
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Class="rz-mb-4">
+    <RadzenIcon Icon="search" />
+    <RadzenTextBox Placeholder="Buscar en todos los campos..." 
+                   Style="width: 100%;" 
+                   @oninput="@OnSearch" />
+</RadzenStack>
+
+<RadzenDataGrid Data="@clientesFiltrados"
+                TItem="ClienteDTO"
+                RowSelect="@(args => AbrirDialogoEditar(args.Id))"
+                AllowPaging="true"
+                PageSize="15"
+                AllowSorting="true"
+                Style="cursor:pointer">
     <Columns>
-        <RadzenDataGridColumn TItem="ClienteDTO" Property="Id" Title="ID" Width="80px" />
+        <RadzenDataGridColumn TItem="ClienteDTO" Width="60px" Sortable="false" Filterable="false">
+            <HeaderTemplate>
+                <RadzenCheckBox TabIndex="-1"
+                                TriState="false"
+                                TValue="bool?"
+                                Value="@(selectedClientes == null || !selectedClientes.Any() ? false : (clientes.Count() == selectedClientes.Count() ? true : (bool?)null))"
+                                Change="@(args => selectedClientes = args == true ? clientes.ToList() : null)" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox TabIndex="-1"
+                                TriState="false"
+                                Value="@(selectedClientes != null && selectedClientes.Contains(data))"
+                                TValue="bool"
+                                TValue="bool"
+                                Change="@(args => OnCheckBoxChange(args, data))"
+                                @onclick:stopPropagation="true" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="Id" Title="ID" Width="70px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Nombre" Title="Nombre" />
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="Direccion" Title="Dirección" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Email" Title="Email" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Telefono" Title="Teléfono" />
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="CategoriaNombre" Title="Categoría" />
     </Columns>
 </RadzenDataGrid>
-   
 
-@code {
+@code
+{
     private IEnumerable<ClienteDTO> clientes;
+    private IEnumerable<ClienteDTO> clientesFiltrados;
+    private string textoBusqueda = "";
 
-    protected override void OnInitialized() => CargarDatos();
+    bool selectorOn = true;
+    IList<ClienteDTO> selectedClientes = new List<ClienteDTO>();
+    RadzenDataGrid<ClienteDTO> grid;
+
+    protected override void OnInitialized()
+    {
+        CargarDatos();
+    }
 
     private void CargarDatos()
     {
         clientes = ClienteService.GetClientesFiltrados();
+        ActualizarFiltro();
     }
+
+    private void OnSearch(ChangeEventArgs args)
+    {
+        textoBusqueda = args.Value.ToString();
+        ActualizarFiltro();
+    }
+
+    void OnCheckBoxChange(bool value, ClienteDTO data)
+    {
+        if (selectedClientes == null) selectedClientes = new List<ClienteDTO>();
+
+        if (value)
+            selectedClientes.Add(data);
+        else
+            selectedClientes.Remove(data);
+    }
+
+    private void ActualizarFiltro()
+    {
+        if (string.IsNullOrWhiteSpace(textoBusqueda))
+        {
+            clientesFiltrados = clientes;
+        }
+        else
+        {
+            var busqueda = textoBusqueda.ToLower();
+            clientesFiltrados = clientes.Where(c => 
+                (c.Nombre?.ToLower().Contains(busqueda) ?? false) ||
+                (c.Direccion?.ToLower().Contains(busqueda) ?? false) ||
+                (c.Email?.ToLower().Contains(busqueda) ?? false) ||
+                (c.Telefono?.ToLower().Contains(busqueda) ?? false) ||
+                (c.CategoriaNombre?.ToLower().Contains(busqueda) ?? false)
+            ).ToList();
+        }
+    }
+
+    private async Task EliminarClientesSeleccionados()
+    {
+        var confirmar = await DialogService.Confirm(
+            $"¿Estás seguro de que deseas eliminar {selectedClientes.Count} clientes?",
+            "Eliminar Múltiples");
+
+        if (confirmar == true)
+        {
+            foreach (var cliente in selectedClientes)
+            {
+                ClienteService.Repository.DeleteCliente(cliente.Id);
+            }
+            selectedClientes.Clear();
+            CargarDatos();
+        }
+    }
+
+    // private void MejoraCategoria()
+    // {
+    //     var confirmar = await DialogService.Confirm(
+    //         $"¿Estás seguro de que deseas eliminar {selectedClientes.Count} clientes?",
+    //         "Eliminar Múltiples");
+
+    //     if (confirmar == true)
+    //     {
+    //         foreach (var cliente in selectedClientes)
+    //         {
+    //             ClienteService.Repository.DeleteCliente(cliente.Id);
+    //         }
+    //         selectedClientes.Clear();
+    //         CargarDatos();
+    //     }
+    // }
 
     private async Task AbrirDialogoAgregar()
     {
-        var res = await DialogService.OpenAsync<ClienteFormDialog>("Nuevo Cliente",
+        var res = await DialogService.OpenAsync<ClienteDetalle>("Registrar Nuevo Cliente",
             new Dictionary<string, object> {
-                { "cliente", new Cliente() },
-                { "EsEdicion", false }
+            { "cliente", new Cliente() }
             });
 
         if (res == true) CargarDatos();
@@ -46,9 +177,10 @@
 
     private async Task AbrirDialogoEditar(int id)
     {
+
         var clienteAEditar = ClienteService.Repository.GetCliente(id);
 
-        var res = await DialogService.OpenAsync<ClienteFormDialog>($"Editar Cliente #{id}",
+        var res = await DialogService.OpenAsync<ClienteDetalle>($"Editar Cliente #{id}",
             new Dictionary<string, object> {
                 { "cliente", clienteAEditar },
                 { "EsEdicion", true }
@@ -56,5 +188,4 @@
 
         if (res == true) CargarDatos();
     }
-
 }
