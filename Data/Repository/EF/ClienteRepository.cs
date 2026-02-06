@@ -21,44 +21,26 @@ namespace Data.Repository.EF
 
 		public IEnumerable<ClienteDTO> GetAllClientes()
 		{
-			return context.Clientes.Include(c => c.CategoriaNavigation)
+			return context.Clientes.Include(c => c.CategoriaNavigation).AsNoTracking()
 						  .Select(c => MapToDto(c)).ToList();
 		}
 
-		public ClienteDTO? GetCliente(int id)
+		public Cliente? GetCliente(int id)
 		{
-			var c = context.Clientes.Include(n => n.CategoriaNavigation).FirstOrDefault(x => x.Id == id);
-			return c != null ? MapToDto(c) : null;
+			return context.Clientes.Include(n => n.CategoriaNavigation).FirstOrDefault(x => x.Id == id);
 		}
 
-		public void AddCliente(ClienteDTO dto)
+		public void AddCliente(Cliente cliente)
 		{
-			var entidad = new Cliente
-			{
-				Nombre = dto.Nombre ?? "",
-				Direccion = dto.Direccion,
-				Email = dto.Email,
-				Telefono = dto.Telefono,
-				Categoria = dto.Categoria
-			};
-			context.Clientes.Add(entidad);
+			context.Clientes.Add(cliente);
 			context.SaveChanges();
-			dto.Id = entidad.Id; 
+	
 		}
 
-		public void UpdateCliente(ClienteDTO dto)
+		public void UpdateCliente(Cliente cliente)
 		{
-			var actual = context.Clientes.Find(dto.Id);
-			if (actual != null)
-			{
-				actual.Nombre = dto.Nombre ?? "";
-				actual.Direccion = dto.Direccion;
-				actual.Email = dto.Email;
-				actual.Telefono = dto.Telefono;
-				actual.Categoria = dto.Categoria;
-				context.Clientes.Update(actual);
-				context.SaveChanges();
-			}
+			context.Clientes.Update(cliente);
+			context.SaveChanges();
 		}
         public void DeleteCliente(int id) {
             var cliente = context.Clientes.Find(id);
@@ -71,7 +53,7 @@ namespace Data.Repository.EF
 
 		public IEnumerable<ClienteDTO> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
 		{
-			var query = context.Clientes.Include(c => c.CategoriaNavigation).AsQueryable();
+			var query = context.Clientes.Include(c => c.CategoriaNavigation).AsNoTracking().AsQueryable();
 
 			if (categoriaIds != null && categoriaIds.Any())
 			{

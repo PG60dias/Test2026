@@ -35,13 +35,18 @@ namespace Test2026
 
         private void ClientesGridView_DoubleClick(object sender, EventArgs e)
         {
-            if (ClientesGridView.CurrentRow.DataBoundItem is ClienteDTO cliente)
+
+            if (ClientesGridView.CurrentRow.DataBoundItem is ClienteDTO clientedto)
             {
-                using var scope = _serviceProvider.CreateScope();
-                var form = scope.ServiceProvider.GetRequiredService<ClientesEditForm>();
-                form.EditCliente(cliente);
-                form.ShowDialog();
-                LoadDataSource();
+				var cliente = _service.Repository.GetCliente(clientedto.Id);
+				if (cliente != null)
+				{
+					using var scope = _serviceProvider.CreateScope();
+					var form = scope.ServiceProvider.GetRequiredService<ClientesEditForm>();
+					form.EditCliente(cliente);
+					form.ShowDialog();
+					LoadDataSource();
+				}
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Data.DTOs;
+using Data.Modelo;
 using Data.Repository.Common;
 
 
@@ -9,11 +10,11 @@ namespace Domain.Services
 
         public IClienteRepository Repository = repository;
 
-        public static void UpdateNombre(ClienteDTO cliente)
+        public static void UpdateNombre(Cliente cliente)
         {
             cliente.Nombre = cliente.Nombre.ToUpper();
         }
-		public bool HanCambiadoLosDatos(ClienteDTO original, string nombre, string direccion, string email, string telefono, int categoriaId)
+		public bool HanCambiadoLosDatos(Cliente original, string nombre, string direccion, string email, string telefono, int categoriaId)
 		{
 			return original.Nombre != nombre ||
 				   original.Direccion != direccion ||

@@ -1,4 +1,5 @@
 using Data.DTOs;
+using Data.Modelo;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +31,7 @@ namespace API.Controllers
 		}
 
 		[HttpPost]
-		public ActionResult <ClienteDTO> Post([FromBody] ClienteDTO cliente)
+		public ActionResult <ClienteDTO> Post([FromBody] Cliente cliente)
 		{
 			_service.Repository.AddCliente(cliente);
 
@@ -45,7 +46,7 @@ namespace API.Controllers
 		}
 
 		[HttpPut("{id}")]
-		public ActionResult Put(int id, [FromBody] ClienteDTO cliente)
+		public ActionResult Put(int id, [FromBody] Cliente cliente)
 		{
 			if (id != cliente.Id)
 				return BadRequest("El ID del cliente no coincide con el del cuerpo.");

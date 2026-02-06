@@ -1,4 +1,4 @@
-﻿using Data.DTOs;
+﻿using Data.Modelo;
 using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +6,7 @@ namespace Desktop
 { 
     public partial class ClientesEditForm : Form
     {
-        private ClienteDTO _cliente = null!;
+        private Cliente _cliente = null!;
         private readonly ClienteService _service;
         private readonly CategoriaService _categoriaService;
 
@@ -23,10 +23,10 @@ namespace Desktop
         public void NewCliente()
         {
             this.Text = "Nuevo Cliente";
-            _cliente = new ClienteDTO();
+            _cliente = new Cliente();
         }
 
-        public void EditCliente(ClienteDTO ClienteOriginal)
+        public void EditCliente(Cliente ClienteOriginal)
         {
 			this.Text = "Editar Cliente";
 			_cliente = ClienteOriginal;

@@ -34,10 +34,9 @@ namespace Data.Repository.Local
 			};
 		}
 
-		public ClienteDTO? GetCliente(int id)
+		public Cliente? GetCliente(int id)
 		{
-			var cliente = _clientes.FirstOrDefault(c => c.Id == id);
-			return cliente != null ? MapToDto(cliente) : null;
+			return _clientes.FirstOrDefault(c => c.Id == id);
 		}
 
 		public IEnumerable<ClienteDTO> GetAllClientes()
@@ -45,34 +44,21 @@ namespace Data.Repository.Local
 			return _clientes.Select(MapToDto).ToList();
 		}
 
-		public void AddCliente(ClienteDTO dto)
+		public void AddCliente(Cliente cliente)
 		{
-			var nuevoCliente = new Cliente
-			{
-				Id = _clientes.Any() ? _clientes.Max(c => c.Id) + 1 : 1,
-				Nombre = dto.Nombre ?? "",
-				Email = dto.Email,
-				Direccion = dto.Direccion,
-				Telefono = dto.Telefono,
-				Categoria = dto.Categoria
-			};
-
-			_clientes.Add(nuevoCliente);
-
-
-			dto.Id = nuevoCliente.Id;
+			_clientes.Add(cliente);
 		}
 
-		public void UpdateCliente(ClienteDTO dto)
+		public void UpdateCliente(Cliente cliente)
 		{
-			var actual = _clientes.FirstOrDefault(c => c.Id == dto.Id);
+			var actual = _clientes.FirstOrDefault(c => c.Id == cliente.Id);
 			if (actual != null)
 			{
-				actual.Nombre = dto.Nombre ?? "";
-				actual.Email = dto.Email;
-				actual.Direccion = dto.Direccion;
-				actual.Telefono = dto.Telefono;
-				actual.Categoria = dto.Categoria;
+				actual.Nombre = cliente.Nombre ?? "";
+				actual.Email = cliente.Email;
+				actual.Direccion = cliente.Direccion;
+				actual.Telefono = cliente.Telefono;
+				actual.Categoria = cliente.Categoria;
 			}
 		}
 
@@ -109,5 +95,5 @@ namespace Data.Repository.Local
 
 			return query.Select(MapToDto).ToList();
 		}
-	}
+    }
 }

@@ -1,0 +1,14 @@
+﻿@page "/clientes"
+@rendermode InteractiveServer
+@inject ClienteService clienteService
+
+<PageTitle>Clientes</PageTitle>
+
+<h3>Clientes</h3>
+
+@code {
+	protected override async Task OnInitializedAsync()
+	{
+		clienteService.Repository.GetAllClientes();
+	}
+}
