@@ -86,8 +86,8 @@ namespace API.Controllers
 				foreach (var column in columns)
 				{
 					var headerTitle = column.Key
-				.Replace("CategoriaNavigation_Nombre", "Categoría") // Traduce el nombre técnico a algo legible
-				.Replace("_", " "); // Quita los guiones bajos de otras columnas con alias
+				.Replace("CategoriaNavigation_Nombre", "Categoría")
+				.Replace("_", " "); 
 
 					headerRow.Append(new Cell()
 					{
@@ -118,7 +118,7 @@ namespace API.Controllers
 							{
 								cell.CellValue = new CellValue() { Text = ((DateTime)value).ToOADate().ToString(CultureInfo.InvariantCulture) };
 								cell.DataType = new EnumValue<CellValues>(CellValues.Number);
-								cell.StyleIndex = 1U; // Índice del estilo de fecha definido abajo
+								cell.StyleIndex = 1U;
 							}
 						}
 						else if (IsNumeric(typeCode))
