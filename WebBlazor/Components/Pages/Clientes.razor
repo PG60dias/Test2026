@@ -19,16 +19,19 @@
                       Click="@EliminarClientesSeleccionados"
                       Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
 
+        <RadzenButton Text="Subir Categoría"
+                      Icon="open_in_browser"
+                      Size="ButtonSize.Small"
+                      Click="@MejoraCategoria"
+                      ButtonStyle="ButtonStyle.Secondary"
+                      Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
+
         <RadzenButton Text="Agregar"
                       Icon="add_circle"
                       Size="ButtonSize.Small"
                       Click="@AbrirDialogoAgregar"
                       ButtonStyle="ButtonStyle.Primary" />
-        <RadzenButton Text="Subir Categoría"
-                      Icon="open_in_browser"
-                      Size="ButtonSize.Small"
-                      Click="@MejoraCategoria"
-                      ButtonStyle="ButtonStyle.Secondary" />
+
     </RadzenStack>
 
 </RadzenStack>
@@ -60,7 +63,6 @@
                 <RadzenCheckBox TabIndex="-1"
                                 TriState="false"
                                 Value="@(selectedClientes != null && selectedClientes.Contains(data))"
-                                TValue="bool"
                                 TValue="bool"
                                 Change="@(args => OnCheckBoxChange(args, data))"
                                 @onclick:stopPropagation="true" />
@@ -139,31 +141,62 @@
 
         if (confirmar == true)
         {
+            try
+            {
+                foreach (var cliente in selectedClientes.ToList())
+                {
+                    ClienteService.Repository.DeleteCliente(cliente.Id);
+                }
+
+                await DialogService.Alert("Proceso finalizado", "Éxito");
+            }
+            catch (Exception ex)
+            {
+                await DialogService.Alert($"No se pudieron borrar algunos clientes: {ex.Message}", "Aviso");
+            }
+            finally
+            {
+                selectedClientes.Clear();
+                CargarDatos();
+            }
+        }
+    }
+
+    private async Task MejoraCategoria()
+    {
+        var confirmar = await DialogService.Confirm(
+            $"¿Estás seguro de que deseas subir de categoría a  {selectedClientes.Count} clientes?",
+            "Subir categoría");
+
+        if (confirmar == true)
+        {
             foreach (var cliente in selectedClientes)
             {
-                ClienteService.Repository.DeleteCliente(cliente.Id);
+                var clienteUpdate = ClienteService.Repository.GetCliente(cliente.Id);
+                if (clienteUpdate != null)
+                {
+                    bool cambio = false;
+
+                    if (clienteUpdate.Categoria == 3)
+                    {
+                        clienteUpdate.Categoria = 1;
+                        cambio = true;
+                    }
+                    else if (clienteUpdate.Categoria == 1)
+                    {
+                        clienteUpdate.Categoria = 2;
+                        cambio = true;
+                    }
+                    if (cambio)
+                    {
+                        ClienteService.Repository.UpdateCliente(clienteUpdate);
+                    }
+                }
             }
             selectedClientes.Clear();
             CargarDatos();
         }
     }
-
-    // private void MejoraCategoria()
-    // {
-    //     var confirmar = await DialogService.Confirm(
-    //         $"¿Estás seguro de que deseas eliminar {selectedClientes.Count} clientes?",
-    //         "Eliminar Múltiples");
-
-    //     if (confirmar == true)
-    //     {
-    //         foreach (var cliente in selectedClientes)
-    //         {
-    //             ClienteService.Repository.DeleteCliente(cliente.Id);
-    //         }
-    //         selectedClientes.Clear();
-    //         CargarDatos();
-    //     }
-    // }
 
     private async Task AbrirDialogoAgregar()
     {

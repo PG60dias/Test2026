@@ -2,6 +2,7 @@ using Data.DTOs;
 using Data.Modelo;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -41,8 +42,26 @@ namespace API.Controllers
 		[HttpDelete("{id}")]
 		public ActionResult Delete(int id)
 		{
-			_service.Repository.DeleteCliente(id);
-			return NoContent();
+			try
+			{
+				var cliente = _service.Repository.GetCliente(id);
+				if (cliente == null)
+				{
+					return NotFound($"No se encontró el cliente con ID {id}");
+				}
+
+				_service.Repository.DeleteCliente(id);
+
+				return NoContent();
+			}
+			catch (DbUpdateException ex)
+			{
+				return Conflict("No se puede eliminar el cliente");
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Error interno: {ex.Message}");
+			}
 		}
 
 		[HttpPut("{id}")]

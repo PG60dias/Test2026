@@ -34,7 +34,7 @@
         </RadzenFormField>
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.End" Class="rz-mt-4">
-            <RadzenButton Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton ButtonType="ButtonType.Submit" Text ="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
             <RadzenButton Text="Cancelar" Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" />
             <RadzenButton Text="Eliminar" Click="@Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
         </RadzenStack>
@@ -46,20 +46,47 @@
     [Parameter] public bool EsEdicion { get; set; } = false;
 
     private IEnumerable<Categoria> listaCategorias;
+
     protected override void OnInitialized()
     {
         listaCategorias = CategoriaService.GetCategorias();
     }
 
-    private void OnSubmit()
+    private async Task OnSubmit()
     {
-        ClienteService.Repository.AddCliente(cliente);
-        DialogService.Close(true);
+        try
+        {
+            if (EsEdicion)
+            {
+                ClienteService.Repository.UpdateCliente(cliente);
+            }
+            else
+            {
+                ClienteService.Repository.AddCliente(cliente);
+            }
+
+            DialogService.Close(true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al guardar: {ex.Message}");
+        }
     }
 
-    private void Delete()
+    private async Task Delete()
     {
-        ClienteService.Repository.DeleteCliente(cliente.Id);
-        DialogService.Close(true);
+        try
+        {
+            var confirmar = await DialogService.Confirm("¿Eliminar este cliente?", "Confirmar");
+            if (confirmar == true)
+            {
+                ClienteService.Repository.DeleteCliente(cliente.Id);
+                DialogService.Close(true);
+            }
+        }
+        catch (Exception ex)
+        {
+            await DialogService.Alert("Error al eliminar: " + ex.Message, "Error");
+        }
     }
 }

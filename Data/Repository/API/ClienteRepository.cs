@@ -24,15 +24,20 @@ namespace Data.Repository.API
 			response.EnsureSuccessStatusCode();
 		}
 
-        public void DeleteCliente(int id)
-        {
+
+		public void DeleteCliente(int id)
+		{
 			var request = new HttpRequestMessage(HttpMethod.Delete, API_ENDPOINT + "Clientes/" + id);
 			var response = _httpClient.Send(request);
-			response.EnsureSuccessStatusCode();
 
+			if (!response.IsSuccessStatusCode)
+			{
+				var mensaje = response.Content.ReadAsStringAsync().Result;
+				throw new Exception(mensaje); 
+			}
 		}
 
-        public IEnumerable<ClienteDTO> GetAllClientes()
+		public IEnumerable<ClienteDTO> GetAllClientes()
         {
 			var request = new HttpRequestMessage(HttpMethod.Get, API_ENDPOINT + "Clientes");
 			var response = _httpClient.Send(request);
