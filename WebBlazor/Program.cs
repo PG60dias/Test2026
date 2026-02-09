@@ -3,6 +3,8 @@ using Domain.Services;
 using Radzen;
 using WebBlazor.Components;
 using WebBlazor.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using WebBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,10 @@ builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteReposi
 builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<ExportService>();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProvider>();
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5000/") });
 
 var app = builder.Build();
 

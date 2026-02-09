@@ -1,32 +1,18 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-
-<head>
+﻿<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="WebBlazor.styles.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <RadzenTheme Theme="material" />
-    <HeadOutlet />
-</head>
 
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
+
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
 <body>
     <Routes @rendermode="InteractiveServer" />
-    <script src="_framework/blazor.web.js"></script>
-    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
-    <script>
-        window.downloadFile = (fileName, contentBase64) => {
-            const link = document.createElement('a');
-            link.download = fileName;
-            link.href = "data:application/octet-stream;base64," + contentBase64;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        };
-    </script>
-</body>
 
-</html>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_framework/blazor.web.js"></script>
+</body>

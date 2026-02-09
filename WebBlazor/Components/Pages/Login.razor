@@ -1,0 +1,81 @@
+﻿@page "/"
+@using Data.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using WebBlazor.Services
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
+@inject DialogService DialogService
+@rendermode InteractiveServer
+
+<PageTitle>Login</PageTitle>
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
+    <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-m-0">Iniciar Sesión</RadzenText>
+</RadzenStack>
+
+@if (errorMessage != null)
+{
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+        @errorMessage
+    </RadzenAlert>
+}
+
+<RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 500px;">
+    <EditForm Model="loginUser" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+
+        <RadzenStack Gap="1.5rem">
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Email</RadzenText>
+                <RadzenTextBox @bind-Value="loginUser.Email" Style="width: 100%;" />
+            </RadzenStack>
+
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Password</RadzenText>
+                <RadzenPassword @bind-Value="loginUser.Password" Style="width: 100%;" />
+            </RadzenStack>
+
+            <RadzenButton ButtonType="ButtonType.Submit"
+                          Text="@(isProcessing ? "Cargando..." : "Entrar")"
+                          Icon="login"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Disabled="@isProcessing"
+                          Class="rz-mt-4" />
+        </RadzenStack>
+    </EditForm>
+</RadzenCard>
+
+@code {
+    private User loginUser = new();
+    private string? errorMessage;
+    private bool isProcessing = false;
+
+    private async Task HandleLogin()
+    {
+        isProcessing = true;
+        errorMessage = null;
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/login", loginUser);
+
+            if (response.IsSuccessStatusCode)
+            {
+                ((AuthenticationProvider)AuthProvider).NotifyAuthenticationStateChanged();
+                Navigation.NavigateTo("/clientes");
+            }
+            else
+            {
+                errorMessage = "Credenciales incorrectas.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error de conexión con la API.";
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+}
