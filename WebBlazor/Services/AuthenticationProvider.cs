@@ -19,7 +19,7 @@ namespace WebBlazor.Services
 			try
 			{
 				
-				var user = await _httpClient.GetFromJsonAsync<User>("api/auth/currentuser");
+				var user = await _httpClient.GetFromJsonAsync<Usuario>("api/auth/currentuser");
 
 				if (user != null && !string.IsNullOrEmpty(user.Email))
 				{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Data.Modelo;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Common;
@@ -14,10 +15,9 @@ public partial class TestDbContext : DbContext
 
     public virtual DbSet<Cliente> Clientes { get; set; }
     public virtual DbSet<Categoria> Categorias { get; set; }
+	public virtual DbSet<Usuario> Usuarios { get; set; }
 
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         OnModelCreatingPartial(modelBuilder);
     }
