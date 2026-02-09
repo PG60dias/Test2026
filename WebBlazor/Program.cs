@@ -2,6 +2,7 @@ using Data.Repository.Common;
 using Domain.Services;
 using Radzen;
 using WebBlazor.Components;
+using WebBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddScoped<CategoriaService, CategoriaService>();
 builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
 builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
 builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<ExportService>();
 
 var app = builder.Build();
 

@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 
 //CONEXIÓN Y DEPENDENCIAS
 builder.Services.AddDbContext<TestDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
+builder.Services.AddScoped<IClienteRepository, Data.Repository.EF.ClienteRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<CategoriaService>();

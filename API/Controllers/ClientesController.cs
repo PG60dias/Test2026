@@ -1,5 +1,7 @@
 using Data.DTOs;
 using Data.Modelo;
+using Data.Common;
+using DocumentFormat.OpenXml.InkML;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +10,19 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ClientesController : ControllerBase
+    public class ClientesController : ExportController
     {
 
 		private readonly ClienteService _service;
-        
-        public ClientesController(ClienteService service)
+		private readonly TestDbContext _context;
+
+		public ClientesController(ClienteService service, TestDbContext context)
         {
             _service = service;
+			_context = context;
         }
 
-	    [HttpGet]
+		[HttpGet]
         public IEnumerable<ClienteDTO> Get()
         {
 			return _service.Repository.GetAllClientes();
@@ -85,6 +89,17 @@ namespace API.Controllers
 			_service.Repository.UpdateCliente(existente);
 
 			return NoContent();
+		}
+
+		[HttpGet("export/excel")]
+		public FileStreamResult ExportarExcel([FromQuery] string? fileName = "Clientes")
+		{
+			var datos = _context.Clientes
+								.Include(c => c.CategoriaNavigation)
+								.AsQueryable();
+			var queryProcesada = ApplyQuery(datos, Request.Query);
+
+			return ToExcel(queryProcesada, fileName);
 		}
 	}
 }

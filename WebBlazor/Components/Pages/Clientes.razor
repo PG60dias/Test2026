@@ -3,9 +3,11 @@
 @using Data.DTOs
 @using Data.Modelo
 @using Domain.Services
+@using WebBlazor.Services
 @inject ClienteService ClienteService
 @inject CategoriaService CategoriaService
 @inject DialogService DialogService
+@inject WebBlazor.Services.ExportService ExportService
  
 <PageTitle>Clientes</PageTitle>
 
@@ -43,13 +45,15 @@
                    @oninput="@OnSearch" />
 </RadzenStack>
 
-<RadzenDataGrid Data="@clientesFiltrados"
+<RadzenDataGrid @ref="grid" 
+                Data="@clientesFiltrados"
                 TItem="ClienteDTO"
                 RowSelect="@(args => AbrirDialogoEditar(args.Id))"
                 AllowPaging="true"
                 PageSize="15"
                 AllowSorting="true"
                 Style="cursor:pointer">
+
     <Columns>
         <RadzenDataGridColumn TItem="ClienteDTO" Width="60px" Sortable="false" Filterable="false">
             <HeaderTemplate>
@@ -77,14 +81,21 @@
     </Columns>
 </RadzenDataGrid>
 
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem;" Class="rz-p-2">
+    <RadzenButton Text="Exportar a Excel"
+                          Icon="grid_on"
+                          Click="@(args => Export("excel"))"
+                          ButtonStyle="ButtonStyle.Success" />
+    </RadzenStack>
+
 @code
 {
     private IEnumerable<ClienteDTO> clientes;
     private IEnumerable<ClienteDTO> clientesFiltrados;
-    private string textoBusqueda = "";
-
-    bool selectorOn = true;
     IList<ClienteDTO> selectedClientes = new List<ClienteDTO>();
+    private string textoBusqueda = "";
+    bool selectorOn = true;
     RadzenDataGrid<ClienteDTO> grid;
 
     protected override void OnInitialized()
@@ -196,6 +207,17 @@
             selectedClientes.Clear();
             CargarDatos();
         }
+    }
+
+    public void Export(string type)
+    {
+        var query = new Query()
+        {
+            OrderBy = grid.Query.OrderBy,
+            Filter = grid.Query.Filter
+        };
+
+        ExportService.Export("Clientes", type, query);
     }
 
     private async Task AbrirDialogoAgregar()
