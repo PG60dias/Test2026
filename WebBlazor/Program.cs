@@ -8,41 +8,54 @@ using WebBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Servicios base
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+	.AddInteractiveServerComponents();
+
+builder.Services.AddControllers(); 
 builder.Services.AddRadzenComponents();
+
+// Inyección de dependencias existente
 builder.Services.AddScoped<ClienteService, ClienteService>();
 builder.Services.AddScoped<CategoriaService, CategoriaService>();
 builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
 builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<ExportService>();
-builder.Services.AddAuthorizationCore();
+
+// Configuración de Autenticación en Blazor
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddAuthentication(options => {
-	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-	options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+	.AddCookie(options =>
+	{
+		options.Cookie.Name = "auth_cookie_blazor";
+		options.LoginPath = "/";
+		options.ExpireTimeSpan = TimeSpan.FromHours(8);
+	});
+
+builder.Services.AddAuthorization();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProvider>();
+
+// HttpClient configurado para la API
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5000/") });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+	app.UseExceptionHandler("/Error", createScopeForErrors: true);
+	app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+	.AddInteractiveServerRenderMode();
 
 app.Run();

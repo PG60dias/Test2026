@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Domain.Services;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -20,24 +21,19 @@ public class AuthController : ControllerBase
 	[HttpPost("login")]
 	public async Task<IActionResult> Login([FromBody] Usuario loginRequest)
 	{
-
+		// Buscamos al usuario por Email
 		var user = await _context.Usuarios
 			.FirstOrDefaultAsync(u => u.Email == loginRequest.Email);
 
+		// Verificamos contraseña usando el PasswordHasher existente
 		if (user != null && PasswordHasher.VerifyPassword(user.Password, loginRequest.Password))
 		{
-			var claims = new List<Claim>
+			// Blazor usa estos datos para crear su propia cookie local.
+			return Ok(new Usuario
 			{
-				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-				new Claim(ClaimTypes.Email, user.Email)
-			};
-
-			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-				new ClaimsPrincipal(claimsIdentity));
-
-			return Ok();
+				Id = user.Id,
+				Email = user.Email
+			});
 		}
 
 		return Unauthorized();
@@ -80,7 +76,7 @@ public class AuthController : ControllerBase
 	[HttpPost("logout")]
 	public async Task<IActionResult> Logout()
 	{
-		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+		// El logout real de la sesión se hace en Blazor
 		return Ok();
 	}
 }

@@ -2,9 +2,7 @@
 @using Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using WebBlazor.Services
-@inject HttpClient Http
 @inject NavigationManager Navigation
-@inject AuthenticationStateProvider AuthProvider
 @inject DialogService DialogService
 @rendermode InteractiveServer
 
@@ -14,72 +12,38 @@
     <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-m-0">Iniciar Sesión</RadzenText>
 </RadzenStack>
 
-@if (errorMessage != null)
+@if (Navigation.Uri.Contains("error=true"))
 {
     <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
-        @errorMessage
+        Credenciales incorrectas o error de conexión.
     </RadzenAlert>
 }
 
 <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 500px;">
-    <EditForm Model="loginUser" OnValidSubmit="GestionarLogin">
-        <DataAnnotationsValidator />
-
+    <form action="account/login" method="post">
+        <AntiforgeryToken />
         <RadzenStack Gap="1.5rem">
             <RadzenStack Gap="0.5rem">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Email</RadzenText>
-                <RadzenTextBox @bind-Value="loginUser.Email" Style="width: 100%;" />
+                <RadzenTextBox Name="email" Style="width: 100%;" />
             </RadzenStack>
 
             <RadzenStack Gap="0.5rem">
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Password</RadzenText>
-                <RadzenPassword @bind-Value="loginUser.Password" Style="width: 100%;" />
+                <RadzenPassword Name="password" Style="width: 100%;" />
             </RadzenStack>
 
             <RadzenButton ButtonType="ButtonType.Submit"
-                          Text="@(isProcessing ? "Cargando..." : "Entrar")"
+                          Text="Entrar"
                           Icon="login"
                           ButtonStyle="ButtonStyle.Primary"
-                          Disabled="@isProcessing"
-                          Class="rz-mt-4" />
+                          Class="rz-mt-4"
+                          Style="width: 100%;" />
+
             <RadzenButton Variant="Variant.Text"
                           Text="Regístrate aquí"
                           Click="@(() => Navigation.NavigateTo("/registro"))"
                           Class="rz-mt-4" />
         </RadzenStack>
-    </EditForm>
+    </form>
 </RadzenCard>
-
-@code {
-    private Usuario loginUser = new();
-    private string? errorMessage;
-    private bool isProcessing = false;
-
-    private async Task GestionarLogin()
-    {
-        isProcessing = true;
-        errorMessage = null;
-        try
-        {
-            var response = await Http.PostAsJsonAsync("api/auth/login", loginUser);
-
-            if (response.IsSuccessStatusCode)
-            {
-                ((AuthenticationProvider)AuthProvider).NotifyAuthenticationStateChanged();
-                Navigation.NavigateTo("/home");
-            }
-            else
-            {
-                errorMessage = "Credenciales incorrectas.";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Error de conexión con la API.";
-        }
-        finally
-        {
-            isProcessing = false;
-        }
-    }
-}
