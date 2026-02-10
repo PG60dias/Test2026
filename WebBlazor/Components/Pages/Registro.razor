@@ -1,0 +1,67 @@
+﻿@page "/registro"
+@using Data.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject NotificationService NotificationService
+@rendermode InteractiveServer
+
+<PageTitle>Registro - Test2026</PageTitle>
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Class="rz-mb-4">
+    <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Crear Nueva Cuenta</RadzenText>
+</RadzenStack>
+
+<RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 500px;">
+    <EditForm Model="user" OnValidSubmit="OnRegister">
+        <DataAnnotationsValidator />
+
+        <RadzenStack Gap="1.5rem">
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2">Correo Electrónico</RadzenText>
+                <RadzenTextBox @bind-Value="user.Email" Style="width: 100%;" />
+            </RadzenStack>
+
+            <RadzenStack Gap="0.5rem">
+                <RadzenText TextStyle="TextStyle.Subtitle2">Contraseña</RadzenText>
+                <RadzenPassword @bind-Value="user.Password" Style="width: 100%;" />
+            </RadzenStack>
+
+            <RadzenButton ButtonType="ButtonType.Submit"
+                          Text="Registrarse"
+                          Icon="person_add"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Class="rz-mt-4" />
+
+            <RadzenButton Variant="Variant.Text"
+                          Text="¿Ya tienes cuenta? Inicia sesión"
+                          Click="@(() => Navigation.NavigateTo("/"))" />
+        </RadzenStack>
+    </EditForm>
+</RadzenCard>
+
+@code {
+    private Usuario user = new();
+
+    async Task OnRegister()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/register", user);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", "Usuario creado correctamente");
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                NotificationService.Notify(NotificationSeverity.Error, "Error", error);
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", "No se pudo conectar con el servidor.");
+        }
+    }
+}

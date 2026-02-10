@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Data.Common; // Namespace donde está tu TestDbContext
+using Data.Common;
 using Data.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;

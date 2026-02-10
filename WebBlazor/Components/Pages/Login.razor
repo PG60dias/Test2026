@@ -42,6 +42,10 @@
                           ButtonStyle="ButtonStyle.Primary"
                           Disabled="@isProcessing"
                           Class="rz-mt-4" />
+            <RadzenButton Variant="Variant.Text"
+                          Text="Regístrate aquí"
+                          Click="@(() => Navigation.NavigateTo("/registro"))"
+                          Class="rz-mt-4" />
         </RadzenStack>
     </EditForm>
 </RadzenCard>

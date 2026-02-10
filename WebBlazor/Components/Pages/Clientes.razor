@@ -8,35 +8,49 @@
 @inject CategoriaService CategoriaService
 @inject DialogService DialogService
 @inject WebBlazor.Services.ExportService ExportService
- 
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
 <PageTitle>Clientes</PageTitle>
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
     <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-m-0">Clientes</RadzenText>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
-        <RadzenButton Text="@($"Borrar {(selectedClientes?.Count ?? 0)} clientes")"
-                      Icon="delete"
-                      Size="ButtonSize.Small"
+        <RadzenButton Text="Cerrar Sesión"
+                      Icon="logout"
                       ButtonStyle="ButtonStyle.Danger"
-                      Click="@EliminarClientesSeleccionados"
-                      Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
-
-        <RadzenButton Text="Subir Categoría"
-                      Icon="open_in_browser"
-                      Size="ButtonSize.Small"
-                      Click="@MejoraCategoria"
-                      ButtonStyle="ButtonStyle.Secondary"
-                      Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
-
-        <RadzenButton Text="Agregar"
-                      Icon="add_circle"
-                      Size="ButtonSize.Small"
-                      Click="@AbrirDialogoAgregar"
-                      ButtonStyle="ButtonStyle.Primary" />
+                      Size="ButtonSize.ExtraSmall"
+                      Variant="Variant.Flat"
+                      Click="@ManejarLogout" />
 
     </RadzenStack>
 
 </RadzenStack>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mb-4">
+
+    <RadzenButton Text="@($"Borrar {(selectedClientes?.Count ?? 0)} clientes")"
+                  Icon="delete"
+                  Size="ButtonSize.Small"
+                  ButtonStyle="ButtonStyle.Danger"
+                  Click="@EliminarClientesSeleccionados"
+                  Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
+
+    <RadzenButton Text="Subir Categoría"
+                  Icon="open_in_browser"
+                  Size="ButtonSize.Small"
+                  ButtonStyle="ButtonStyle.Secondary"
+                  Click="@MejoraCategoria"
+                  Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
+
+    <RadzenButton Text="Agregar"
+                  Icon="add_circle"
+                  Size="ButtonSize.Small"
+                  ButtonStyle="ButtonStyle.Primary"
+                  Click="@AbrirDialogoAgregar" />
+
+</RadzenStack>
+
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Class="rz-mb-4">
     <RadzenIcon Icon="search" />
@@ -50,7 +64,7 @@
                 TItem="ClienteDTO"
                 RowSelect="@(args => AbrirDialogoEditar(args.Id))"
                 AllowPaging="true"
-                PageSize="15"
+                PageSize="12"
                 AllowSorting="true"
                 Style="cursor:pointer">
 
@@ -219,6 +233,16 @@
         };
 
         ExportService.Export("Clientes", type, query);
+    }
+
+    async Task ManejarLogout()
+    {
+        var response = await Http.PostAsync("api/auth/logout", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Navigation.NavigateTo("/", forceLoad: true);
+        }
     }
 
     private async Task AbrirDialogoAgregar()
