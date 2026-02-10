@@ -1,6 +1,7 @@
 ﻿@page "/Error"
+@attribute [Authorize]
 @using System.Diagnostics
-
+@using Microsoft.AspNetCore.Authorization
 <PageTitle>Error</PageTitle>
 
 <h1 class="text-danger">Error.</h1>

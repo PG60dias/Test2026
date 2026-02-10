@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using Data.Models;
-using System.Net.Http.Json;
 
 namespace WebBlazor.Services
 {

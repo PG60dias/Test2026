@@ -1,9 +1,9 @@
 using Data.Repository.Common;
 using Domain.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 using Radzen;
 using WebBlazor.Components;
-using WebBlazor.Services;
-using Microsoft.AspNetCore.Components.Authorization;
 using WebBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +19,11 @@ builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<ExportService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddAuthentication(options => {
+	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProvider>();
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5000/") });
 

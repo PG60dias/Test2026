@@ -22,7 +22,7 @@
 }
 
 <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 500px;">
-    <EditForm Model="loginUser" OnValidSubmit="HandleLogin">
+    <EditForm Model="loginUser" OnValidSubmit="GestionarLogin">
         <DataAnnotationsValidator />
 
         <RadzenStack Gap="1.5rem">
@@ -55,7 +55,7 @@
     private string? errorMessage;
     private bool isProcessing = false;
 
-    private async Task HandleLogin()
+    private async Task GestionarLogin()
     {
         isProcessing = true;
         errorMessage = null;
@@ -66,7 +66,7 @@
             if (response.IsSuccessStatusCode)
             {
                 ((AuthenticationProvider)AuthProvider).NotifyAuthenticationStateChanged();
-                Navigation.NavigateTo("/clientes");
+                Navigation.NavigateTo("/home");
             }
             else
             {

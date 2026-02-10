@@ -1,9 +1,6 @@
 ﻿@page "/clientes"
+@attribute [Authorize]
 @rendermode InteractiveServer
-@using Data.DTOs
-@using Data.Modelo
-@using Domain.Services
-@using WebBlazor.Services
 @inject ClienteService ClienteService
 @inject CategoriaService CategoriaService
 @inject DialogService DialogService
@@ -62,6 +59,7 @@
 <RadzenDataGrid @ref="grid" 
                 Data="@clientesFiltrados"
                 TItem="ClienteDTO"
+                ExpandMode="DataGridExpandMode.Single"
                 RowSelect="@(args => AbrirDialogoEditar(args.Id))"
                 AllowPaging="true"
                 PageSize="12"
@@ -93,6 +91,20 @@
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Telefono" Title="Teléfono" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="CategoriaNombre" Title="Categoría" />
     </Columns>
+    <Template Context="user">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Class="rz-mb-4">
+             <RadzenText TextStyle="TextStyle.Subtitle1">
+                <RadzenButton Text="Llamada telefónica "
+                                  Icon="call"
+                                  Size="ButtonSize.ExtraSmall"/>
+                </RadzenText>
+             <RadzenText TextStyle="TextStyle.Subtitle1">
+                <RadzenButton Text="Mandar Correo "
+                              Icon="email"
+                              Size="ButtonSize.ExtraSmall"/>
+                </RadzenText>
+        </RadzenStack>
+    </Template>
 </RadzenDataGrid>
 
 
@@ -237,12 +249,10 @@
 
     async Task ManejarLogout()
     {
-        var response = await Http.PostAsync("api/auth/logout", null);
+        await Http.PostAsync("api/auth/logout", null);
 
-        if (response.IsSuccessStatusCode)
-        {
-            Navigation.NavigateTo("/", forceLoad: true);
-        }
+        Navigation.NavigateTo("/", forceLoad: true);
+  
     }
 
     private async Task AbrirDialogoAgregar()
