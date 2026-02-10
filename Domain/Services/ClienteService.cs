@@ -2,7 +2,7 @@
 using Data.Modelo;
 using Data.Repository.Common;
 
-
+//
 namespace Domain.Services
 {
     public class ClienteService(IClienteRepository repository)
