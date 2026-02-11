@@ -1,0 +1,76 @@
+﻿@page "/trazabilidad"
+@using Data.Models
+@using Data.Repository.Common
+@using Radzen
+@using Radzen.Blazor
+@inject ILogRepository LogRepository
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<PageTitle>Historial de Cambios</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">Trazabilidad de Cambios</RadzenText>
+
+@if (logs == null)
+{
+    <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+}
+else
+{
+    <RadzenDataGrid AllowFiltering="true"
+                    AllowColumnResize="true"
+                    AllowAlternatingRows="false"
+                    FilterMode="FilterMode.Advanced"
+                    AllowSorting="true"
+                    PageSize="10"
+                    AllowPaging="true"
+                    PagerHorizontalAlign="HorizontalAlign.Left"
+                    ShowPagingSummary="true"
+                    Data="@logs"
+                    TItem="Log"
+                    ColumnWidth="150px"
+                    LogicalFilterOperator="LogicalFilterOperator.Or">
+        <Columns>
+            <RadzenDataGridColumn TItem="Log" Property="Fecha" Title="Fecha" FormatString="{0:dd/MM/yyyy HH:mm}" Width="160px" />
+
+            <RadzenDataGridColumn TItem="Log" Property="UsuarioId" Title="ID Usuario" Width="100px" TextAlign="TextAlign.Center" />
+
+            <RadzenDataGridColumn TItem="Log" Property="Entidad" Title="Entidad">
+                <Template Context="data">
+                    @data.Entidad <strong>(ID: @data.EntidadId)</strong>
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Log" Property="Accion" Title="Acción" Width="120px">
+                <Template Context="data">
+                    <RadzenBadge BadgeStyle="@GetBadgeStyle(data.Accion)" Text="@data.Accion" />
+                </Template>
+            </RadzenDataGridColumn>
+
+            <RadzenDataGridColumn TItem="Log" Property="ValorViejo" Title="Valor Anterior" Sortable="false" Filterable="false" />
+
+            <RadzenDataGridColumn TItem="Log" Property="ValorNuevo" Title="Valor Nuevo" Sortable="false" Filterable="false" />
+        </Columns>
+    </RadzenDataGrid>
+}
+
+@code {
+    private IEnumerable<Log>? logs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Carga asíncrona que no bloquea la UI ni afecta a WinForms
+        logs = await LogRepository.GetLogsAsync();
+    }
+
+    // Método auxiliar para dar color a las etiquetas de acción
+    private BadgeStyle GetBadgeStyle(string accion)
+    {
+        return accion.ToLower() switch
+        {
+            "insert" or "crear" => BadgeStyle.Success,
+            "update" or "editar" => BadgeStyle.Warning,
+            "delete" or "borrar" => BadgeStyle.Danger,
+            _ => BadgeStyle.Info
+        };
+    }
+}
