@@ -1,5 +1,6 @@
 using Data.Repository.Common;
 using Domain.Services;
+using Data.Repository.API;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Radzen;
@@ -16,10 +17,13 @@ builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 
 // Inyección de dependencias existente
-builder.Services.AddScoped<ClienteService, ClienteService>();
-builder.Services.AddScoped<CategoriaService, CategoriaService>();
 builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
 builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
+
+builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<CategoriaService>();
+
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<ExportService>();
 

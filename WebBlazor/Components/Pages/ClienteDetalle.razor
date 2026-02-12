@@ -1,8 +1,11 @@
 ﻿@using Data.DTOs
 @using Data.Modelo
+@using Data.Models
+@using Data.Repository.Common
 @using Domain.Services
 @inject ClienteService ClienteService
 @inject CategoriaService CategoriaService
+@inject ILogRepository LogRepository
 @inject DialogService DialogService
 
 <RadzenTemplateForm TItem="Cliente" Data="@cliente" Submit="@OnSubmit">
@@ -44,12 +47,23 @@
 @code {
     [Parameter] public Cliente cliente { get; set; } = new Cliente();
     [Parameter] public bool EsEdicion { get; set; } = false;
+    private Cliente? clienteOriginal; // Para comparar cambios
 
     private IEnumerable<Categoria> listaCategorias;
 
     protected override void OnInitialized()
     {
         listaCategorias = CategoriaService.GetCategorias();
+        if (EsEdicion)
+        {
+            // Clonamos el objeto para la trazabilidad
+            clienteOriginal = new Cliente
+            {
+                Nombre = cliente.Nombre,
+                Direccion = cliente.Direccion,
+                Categoria = cliente.Categoria
+            };
+        }
     }
 
     private async Task OnSubmit()
@@ -58,7 +72,20 @@
         {
             if (EsEdicion)
             {
+                // Llamada asíncrona al repositorio (asegúrate de que el repo soporte UpdateClienteAsync)
                 ClienteService.Repository.UpdateCliente(cliente);
+
+                // Registro de trazabilidad
+                await LogRepository.AddLogAsync(new Log
+                {
+                    UsuarioId = 1, // Obtener del auth state
+                    Entidad = "Cliente",
+                    EntidadId = cliente.Id,
+                    Accion = "Update",
+                    ValorViejo = $"Nombre: {clienteOriginal?.Nombre}, Cat: {clienteOriginal?.Categoria}",
+                    ValorNuevo = $"Nombre: {cliente.Nombre}, Cat: {cliente.Categoria}",
+                    Fecha = DateTime.Now
+                });
             }
             else
             {
@@ -69,24 +96,28 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al guardar: {ex.Message}");
+            await DialogService.Alert($"Error al guardar: {ex.Message}");
         }
     }
 
     private async Task Delete()
     {
-        try
+        var confirmar = await DialogService.Confirm("¿Eliminar este cliente?", "Confirmar");
+        if (confirmar == true)
         {
-            var confirmar = await DialogService.Confirm("¿Eliminar este cliente?", "Confirmar");
-            if (confirmar == true)
+            ClienteService.Repository.DeleteCliente(cliente.Id);
+
+            await LogRepository.AddLogAsync(new Log
             {
-                ClienteService.Repository.DeleteCliente(cliente.Id);
-                DialogService.Close(true);
-            }
-        }
-        catch (Exception ex)
-        {
-            await DialogService.Alert("Error al eliminar: " + ex.Message, "Error");
+                UsuarioId = 1,
+                EntidadId = cliente.Id,
+                Entidad = "Cliente",
+                Accion = "Delete",
+                ValorViejo = cliente.Nombre,
+                Fecha = DateTime.Now
+            });
+
+            DialogService.Close(true);
         }
     }
 }

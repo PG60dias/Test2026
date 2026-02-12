@@ -16,6 +16,7 @@ namespace API.Controllers
 		{
 			// Retorna los logs ordenados por fecha descendente para ver lo más reciente primero
 			return await _context.Set<Log>()
+								 .AsNoTracking()
 								 .OrderByDescending(l => l.Fecha)
 								 .ToListAsync();
 		}

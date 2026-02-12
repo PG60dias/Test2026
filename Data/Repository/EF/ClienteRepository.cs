@@ -57,7 +57,7 @@ namespace Data.Repository.EF
 
 			if (categoriaIds != null && categoriaIds.Any())
 			{
-				query = query.Where(c => categoriaIds.Contains(c.Categoria ?? 0));
+				query = query.Where(c => categoriaIds.Contains(c.Categoria));
 			}
 
 			if (!string.IsNullOrWhiteSpace(busqueda))

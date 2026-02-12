@@ -56,13 +56,30 @@ else
 @code {
     private IEnumerable<Log>? logs;
 
+
     protected override async Task OnInitializedAsync()
     {
-        // Carga asíncrona que no bloquea la UI ni afecta a WinForms
-        logs = await LogRepository.GetLogsAsync();
+        await base.OnInitializedAsync();
     }
 
-    // Método auxiliar para dar color a las etiquetas de acción
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                logs = await LogRepository.GetLogsAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error cargando logs: {ex.Message}");
+            }
+            finally
+            {
+                StateHasChanged();
+            }
+        }
+    }
     private BadgeStyle GetBadgeStyle(string accion)
     {
         return accion.ToLower() switch

@@ -13,12 +13,12 @@ namespace Data.Repository.API
 
 		public async Task<IEnumerable<Log>> GetLogsAsync()
 		{
-			return await _http.GetFromJsonAsync<IEnumerable<Log>>("api/Logs") ?? new List<Log>();
+			return await _http.GetFromJsonAsync<IEnumerable<Log>>("api/Logs").ConfigureAwait(false) ?? new List<Log>();
 		}
 
 		public async Task AddLogAsync(Log log)
 		{
-			await _http.PostAsJsonAsync("api/Logs", log);
+			await _http.PostAsJsonAsync("api/Logs", log).ConfigureAwait(false);
 		}
 	}
 }
