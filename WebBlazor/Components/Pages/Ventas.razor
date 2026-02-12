@@ -16,11 +16,6 @@
                       ButtonStyle="ButtonStyle.Secondary"
                       Click="@CargarVentas"
                       Disabled="@isProcessing" />
-
-        @if (isProcessing)
-        {
-            <RadzenProgressBar Value="100" Mode="ProgressBarMode.Indeterminate" Style="width: 200px" />
-        }
 </RadzenCard>
 
 <RadzenDataGrid AllowFiltering="true"
@@ -32,10 +27,35 @@
                 AllowPaging="true"
                 PagerHorizontalAlign="HorizontalAlign.Left"
                 ShowPagingSummary="true"
+                @ref="gridVentas"
                 Data="@ventas"
                 TItem="Venta"
                 ColumnWidth="300px"
                 EmptyText="No hay ventas registradas.">
+
+    <Template Context="venta">
+        <RadzenTabs RenderMode="TabRenderMode.Client">
+            <Tabs>
+                    <RadzenDataGrid Data="@venta.Detalles" TItem="VentaDetalle" AllowPaging="true" PageSize="5">
+                        <Columns>
+                            <RadzenDataGridColumn TItem="VentaDetalle" Property="ArticuloId" Title="ID Art." Width="70px" />
+                            <RadzenDataGridColumn TItem="VentaDetalle" Property="Cantidad" Title="Cant." Width="80px" />
+                            <RadzenDataGridColumn TItem="VentaDetalle" Property="PrecioAplicado" Title="Precio Unit.">
+                                <Template Context="detalle">
+                                    @detalle.PrecioAplicado.ToString("C2")
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="VentaDetalle" Title="Subtotal">
+                                <Template Context="detalle">
+                                    @((detalle.PrecioAplicado * detalle.Cantidad).ToString("C2"))
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+            </Tabs>
+        </RadzenTabs>
+    </Template>
+
     <Columns>
         <RadzenDataGridColumn TItem="Venta" Property="Id" Title="ID Venta" Width="80px" />
         <RadzenDataGridColumn TItem="Venta" Property="ClienteId" Title="ID Cliente" Width="100px" />
@@ -58,6 +78,7 @@
 </RadzenDataGrid>
 
 @code {
+    RadzenDataGrid<Venta> gridVentas;
     IEnumerable<Venta> ventas;
     bool isProcessing = false;
 
@@ -69,6 +90,12 @@
     async Task CargarVentas()
     {
         ventas = await ArticuloRepo.GetVentasAsync();
+
+        if (gridVentas != null)
+        {
+            await gridVentas.Reload();
+        }
+        StateHasChanged();
     }
 
     async Task ProcesarVentas(int cantidad)

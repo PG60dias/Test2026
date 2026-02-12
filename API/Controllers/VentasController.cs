@@ -13,9 +13,10 @@ namespace API.Controllers
 		private readonly Random _random = new();
 
 		[HttpPost("generar-masivo")]
-		[HttpPost("generar-masivo")]
 		public async Task<IActionResult> GenerarMasivo([FromQuery] int cantidad = 10)
 		{
+			// Usamos una transacción para que se guarde TODO o NADA
+			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
 				var clientes = await _context.Clientes.ToListAsync();
@@ -28,63 +29,63 @@ namespace API.Controllers
 				{
 					var cliente = clientes[_random.Next(clientes.Count)];
 
-					// Lógica de fecha aleatoria
 					DateTime inicio = new(2025, 1, 1);
-					int rangoDias = (new DateTime(2026, 1, 31) - inicio).Days;
+					int rangoDias = (DateTime.Today - inicio).Days;
 					DateTime fechaAleatoria = inicio.AddDays(_random.Next(rangoDias));
 
-					// Crea la venta
 					var nuevaVenta = new Venta
 					{
 						ClienteId = cliente.Id,
-						Fecha = fechaAleatoria
+						Fecha = fechaAleatoria,
+						Detalles = new List<VentaDetalle>() // Inicializamos la lista
 					};
-					_context.Ventas.Add(nuevaVenta);
-					await _context.SaveChangesAsync();
 
-					// Genera los detalles
 					int productosDiferentes = _random.Next(1, 6);
 
 					for (int j = 0; j < productosDiferentes; j++)
 					{
 						var articulo = articulos[_random.Next(articulos.Count)];
 
-						// Lógica de precios
 						decimal precioAplicado = articulo.PVP;
 						if (cliente.Categoria == 3) precioAplicado = articulo.PVP * 0.75m;
 						else if (cliente.Categoria == 1) precioAplicado = articulo.PVP * 1.10m;
 
-						// Conecta el detalle con la venta de arriba
-						var detalle = new VentaDetalle
+						// Agregamos el detalle directamente a la colección de la venta
+						nuevaVenta.Detalles.Add(new VentaDetalle
 						{
-							VentaId = nuevaVenta.Id, 
 							ArticuloId = articulo.Id,
 							Cantidad = _random.Next(1, 6),
 							PrecioAplicado = precioAplicado
-						};
-
-						_context.VentasDetalle.Add(detalle);
+						});
 
 						articulo.PrecioUltimaVenta = precioAplicado;
-						_context.Articulos.Update(articulo);
 					}
+
+					_context.Ventas.Add(nuevaVenta);
 				}
 
+				// Un solo SaveChanges para todas las ventas y detalles
 				await _context.SaveChangesAsync();
 
-				return Ok(new { mensaje = $"Generadas {cantidad} ventas con múltiples productos cada una." });
+				// Confirmamos los cambios en SQL
+				await transaction.CommitAsync();
+
+				return Ok(new { mensaje = $"Generadas {cantidad} ventas correctamente." });
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, $"Error: {ex.Message}");
+				await transaction.RollbackAsync();
+				// Logueamos el error interno para saber por qué SQL rechaza los datos
+				var innerError = ex.InnerException?.Message ?? ex.Message;
+				return StatusCode(500, $"Error en SQL: {innerError}");
 			}
 		}
-
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Venta>>> GetVentas()
 		{
 			return await _context.Ventas
-				.Include(v => v.Detalles)
+				.Include(v => v.Detalles) // Carga los detalles
+				.ThenInclude(d => d.Articulo) // Carga el nombre del producto
 				.OrderByDescending(v => v.Fecha)
 				.ToListAsync();
 		}

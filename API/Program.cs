@@ -16,6 +16,7 @@ builder.Services.AddControllers()
 		options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 		options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 	});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
