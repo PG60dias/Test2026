@@ -3,20 +3,21 @@
 @using Data.Repository.Common
 @inject IArticuloRepository ArticuloRepo
 @inject NotificationService NotificationService
+@inject DialogService DialogService
 
 <RadzenText TextStyle="TextStyle.H3">Gestión de Ventas</RadzenText>
 
-<RadzenCard class="my-4">
-        <RadzenButton Text="Generar 10 Ventas"
-                      ButtonStyle="ButtonStyle.Warning"
-                      Click="@(() => ProcesarVentas(10))"
-                      Disabled="@isProcessing" />
 
-        <RadzenButton Text="Refrescar Tabla"
-                      ButtonStyle="ButtonStyle.Secondary"
-                      Click="@CargarVentas"
-                      Disabled="@isProcessing" />
-</RadzenCard>
+<RadzenButton Text="Generar 10 Ventas"
+              ButtonStyle="ButtonStyle.Warning"
+              Click="@(() => ProcesarVentas(10))"
+              Disabled="@isProcessing" />
+
+<RadzenButton Text="Refrescar Tabla"
+              ButtonStyle="ButtonStyle.Secondary"
+              Click="@CargarVentas"
+              Disabled="@isProcessing" />
+
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -66,7 +67,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Venta" Title="Total Artículos" Width="120px">
             <Template Context="venta">
-                @venta.Detalles.Count
+                @(venta.Detalles?.Sum(d => d.Cantidad) ?? 0)
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Venta" Title="Importe Total" Width="150px">
@@ -100,8 +101,10 @@
 
     async Task ProcesarVentas(int cantidad)
     {
-        isProcessing = true;
-        try
+        var confirm = await DialogService.Confirm($"Quieres generar {cantidad} ventas?", "Generador");
+        if (confirm == true)
+        {
+           try
         {
             await ArticuloRepo.GenerarVentasMasivasAsync(cantidad);
             await CargarVentas();
@@ -114,6 +117,9 @@
         finally
         {
             isProcessing = false;
+        } 
         }
+        
     }
+
 }

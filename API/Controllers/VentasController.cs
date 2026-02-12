@@ -15,7 +15,6 @@ namespace API.Controllers
 		[HttpPost("generar-masivo")]
 		public async Task<IActionResult> GenerarMasivo([FromQuery] int cantidad = 10)
 		{
-			// Usamos una transacción para que se guarde TODO o NADA
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
@@ -40,23 +39,26 @@ namespace API.Controllers
 						Detalles = new List<VentaDetalle>() // Inicializamos la lista
 					};
 
-					int productosDiferentes = _random.Next(1, 6);
+					int totalUnidadesVenta = 0; // Variable para sumar todas las cantidades
+					int tiposDeProductos = _random.Next(1, 6);
 
-					for (int j = 0; j < productosDiferentes; j++)
+					for (int j = 0; j < tiposDeProductos; j++)
 					{
 						var articulo = articulos[_random.Next(articulos.Count)];
+						int cantidadAzar = _random.Next(1, 6);
 
 						decimal precioAplicado = articulo.PVP;
 						if (cliente.Categoria == 3) precioAplicado = articulo.PVP * 0.75m;
 						else if (cliente.Categoria == 1) precioAplicado = articulo.PVP * 1.10m;
 
-						// Agregamos el detalle directamente a la colección de la venta
 						nuevaVenta.Detalles.Add(new VentaDetalle
 						{
 							ArticuloId = articulo.Id,
-							Cantidad = _random.Next(1, 6),
+							Cantidad = cantidadAzar,
 							PrecioAplicado = precioAplicado
 						});
+
+						totalUnidadesVenta += cantidadAzar;
 
 						articulo.PrecioUltimaVenta = precioAplicado;
 					}
@@ -75,7 +77,6 @@ namespace API.Controllers
 			catch (Exception ex)
 			{
 				await transaction.RollbackAsync();
-				// Logueamos el error interno para saber por qué SQL rechaza los datos
 				var innerError = ex.InnerException?.Message ?? ex.Message;
 				return StatusCode(500, $"Error en SQL: {innerError}");
 			}

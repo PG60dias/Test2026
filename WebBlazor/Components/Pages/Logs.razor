@@ -38,9 +38,7 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Log" Property="Accion" Title="Acción" Width="120px">
-                <Template Context="data">
-                    <RadzenBadge BadgeStyle="@GetBadgeStyle(data.Accion)" Text="@data.Accion" />
-                </Template>
+                <Template Context="data"> Text="@data.Accion" </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Log" Property="ValorViejo" Title="Valor Anterior" Sortable="false" Filterable="false" />
             <RadzenDataGridColumn TItem="Log" Property="ValorNuevo" Title="Valor Nuevo" Sortable="false" Filterable="false" />
@@ -78,14 +76,4 @@ else
         }
     }
 
-    private BadgeStyle GetBadgeStyle(string accion)
-    {
-        return accion.ToLower() switch
-        {
-            "insert" or "crear" => BadgeStyle.Success,
-            "update" or "editar" => BadgeStyle.Warning,
-            "delete" or "borrar" => BadgeStyle.Danger,
-            _ => BadgeStyle.Info
-        };
-    }
 }
