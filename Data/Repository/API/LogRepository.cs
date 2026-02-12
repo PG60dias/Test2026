@@ -12,15 +12,15 @@ namespace Data.Repository.API
 		private readonly HttpClient _http = http;
 
 		public async Task<IEnumerable<Log>> GetLogsAsync()
-		{
-			// Cambiado de "api/Logs" a "Logs" para coincidir con tu controlador
-			return await _http.GetFromJsonAsync<IEnumerable<Log>>("Logs").ConfigureAwait(false) ?? new List<Log>();
-		}
+{
+			return await _http.GetFromJsonAsync<IEnumerable<Log>>("Logs") ?? new List<Log>();
+		
+}
 
-		public async Task AddLogAsync(Log log)
-		{
-			// Cambiado de "api/Logs" a "Logs"
-			await _http.PostAsJsonAsync("Logs", log).ConfigureAwait(false);
-		}
+public async Task AddLogAsync(Log log)
+{
+    // Cambiado de "api/Logs" a "Logs"
+    await _http.PostAsJsonAsync("Logs", log).ConfigureAwait(false);
+}
 	}
 }

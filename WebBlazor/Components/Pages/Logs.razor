@@ -1,4 +1,4 @@
-﻿@page "/trazabilidad"
+﻿@page "/logs"
 @using Data.Models
 @using Data.Repository.Common
 @using Radzen
@@ -54,14 +54,27 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await CargarDatosAsync();
+    }
+
+    private async Task CargarDatosAsync()
+    {
         try
         {
-            // Cargamos los datos aquí para que estén listos antes del renderizado
-            logs = await LogRepository.GetLogsAsync();
+            errorCarga = false;
+            // Forzamos la espera de la tarea asíncrona
+            var resultado = await LogRepository.GetLogsAsync();
+            logs = resultado ?? new List<Log>();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error cargando logs: {ex.Message}");
+            errorCarga = true;
+            logs = new List<Log>(); // Evita el bucle de carga infinito
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged(); // Notifica a Blazor que debe re-renderizar
         }
     }
 
