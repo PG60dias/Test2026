@@ -17,12 +17,16 @@ builder.Services.AddRadzenComponents();
 
 // --- INYECCIÓN DE DEPENDENCIAS ---
 
-// 1. Repositorios (Mantenemos el síncrono por compatibilidad y añadimos el asíncrono)
-builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
-builder.Services.AddScoped<IClienteRepositoryAsync, Data.Repository.API.ClienteRepositoryAsync>();
-builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
-builder.Services.AddScoped<ILogRepository, Data.Repository.API.LogRepository>();
-builder.Services.AddScoped<ICategoriaRepositoryAsync, CategoriaRepositoryAsync>();
+builder.Services.AddScoped<ClienteRepositoryAsync>();
+builder.Services.AddScoped<IClienteRepository>(sp => sp.GetRequiredService<ClienteRepositoryAsync>());
+builder.Services.AddScoped<IClienteRepositoryAsync>(sp => sp.GetRequiredService<ClienteRepositoryAsync>());
+
+builder.Services.AddScoped<CategoriaRepositoryAsync>();
+builder.Services.AddScoped<ICategoriaRepository>(sp => sp.GetRequiredService<CategoriaRepositoryAsync>());
+builder.Services.AddScoped<ICategoriaRepositoryAsync>(sp => sp.GetRequiredService<CategoriaRepositoryAsync>());
+
+builder.Services.AddScoped<IArticuloRepository, ArticuloRepositoryAsync>();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
 // 2. Servicios de Dominio
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<CategoriaService>();

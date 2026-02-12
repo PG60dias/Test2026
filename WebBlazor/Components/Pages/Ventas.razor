@@ -1,0 +1,92 @@
+﻿@page "/ventas"
+@using Data.Models
+@using Data.Repository.Common
+@inject IArticuloRepository ArticuloRepo
+@inject NotificationService NotificationService
+
+<RadzenText TextStyle="TextStyle.H3">Gestión de Ventas</RadzenText>
+
+<RadzenCard class="my-4">
+        <RadzenButton Text="Generar 10 Ventas"
+                      ButtonStyle="ButtonStyle.Warning"
+                      Click="@(() => ProcesarVentas(10))"
+                      Disabled="@isProcessing" />
+
+        <RadzenButton Text="Refrescar Tabla"
+                      ButtonStyle="ButtonStyle.Secondary"
+                      Click="@CargarVentas"
+                      Disabled="@isProcessing" />
+
+        @if (isProcessing)
+        {
+            <RadzenProgressBar Value="100" Mode="ProgressBarMode.Indeterminate" Style="width: 200px" />
+        }
+</RadzenCard>
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                FilterMode="FilterMode.Advanced"
+                AllowSorting="true"
+                PageSize="10"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                Data="@ventas"
+                TItem="Venta"
+                ColumnWidth="300px"
+                EmptyText="No hay ventas registradas.">
+    <Columns>
+        <RadzenDataGridColumn TItem="Venta" Property="Id" Title="ID Venta" Width="80px" />
+        <RadzenDataGridColumn TItem="Venta" Property="ClienteId" Title="ID Cliente" Width="100px" />
+        <RadzenDataGridColumn TItem="Venta" Property="Fecha" Title="Fecha" Width="200px">
+            <Template Context="venta">
+                @venta.Fecha.ToString("dd/MM/yyyy")
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Venta" Title="Total Artículos" Width="120px">
+            <Template Context="venta">
+                @venta.Detalles.Count
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Venta" Title="Importe Total" Width="150px">
+            <Template Context="venta">
+                @venta.Detalles.Sum(d => d.PrecioAplicado * d.Cantidad).ToString("C2")
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<Venta> ventas;
+    bool isProcessing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarVentas();
+    }
+
+    async Task CargarVentas()
+    {
+        ventas = await ArticuloRepo.GetVentasAsync();
+    }
+
+    async Task ProcesarVentas(int cantidad)
+    {
+        isProcessing = true;
+        try
+        {
+            await ArticuloRepo.GenerarVentasMasivasAsync(cantidad);
+            await CargarVentas();
+            NotificationService.Notify(NotificationSeverity.Success, "Éxito", $"Generadas {cantidad} ventas");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", ex.Message);
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+}

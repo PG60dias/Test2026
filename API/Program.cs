@@ -20,11 +20,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //CONEXIÓN Y DEPENDENCIAS
-builder.Services.AddDbContext<TestDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<TestDbContext>(options =>
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+	ServiceLifetime.Scoped);
 builder.Services.AddScoped<IClienteRepository, Data.Repository.EF.ClienteRepository>();
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<ClienteService>();
-builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<Domain.Services.CategoriaService>();
+builder.Services.AddScoped<Data.Repository.Common.ICategoriaRepository>(provider =>
+{
+	var context = provider.GetRequiredService<TestDbContext>();
+	return new Data.Repository.API.CategoriaRepository(context);
+});
+
 //CONFIGURACION COOKIE
 builder.Services.AddAuthentication(options => {
 	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -51,7 +58,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-	app.UseDeveloperExceptionPage(); // Esto te mostrará el error exacto en el navegador
+	app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

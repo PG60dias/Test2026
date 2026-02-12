@@ -19,7 +19,7 @@ namespace Data.Repository.API
 
 public async Task AddLogAsync(Log log)
 {
-    // Cambiado de "api/Logs" a "Logs"
+
     await _http.PostAsJsonAsync("Logs", log).ConfigureAwait(false);
 }
 	}

@@ -17,6 +17,10 @@ public partial class TestDbContext : DbContext
     public virtual DbSet<Categoria> Categorias { get; set; }
 	public virtual DbSet<Usuario> Usuarios { get; set; }
 	public DbSet<Log> Logs { get; set; }
+	public DbSet<Articulo> Articulos { get; set; }
+	public DbSet<CategoriaProducto> CategoriasProductos { get; set; }
+	public DbSet<Venta> Ventas { get; set; }
+	public DbSet<VentaDetalle> VentasDetalle { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

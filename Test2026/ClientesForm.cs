@@ -152,9 +152,9 @@ namespace Test2026
         private void AplicarFiltros()
         {
             var seleccionados = new List<int>();
-            if (PremiumCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Premium);
-            if (ClientesStandardCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Standard);
-            if (ClientesPruebaCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Prueba);
+            if (PremiumCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.VIP);
+            if (ClientesStandardCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.Habitual);
+            if (ClientesPruebaCheckBox.Checked) seleccionados.Add((int)CategoriaCliente.DePaso);
 
             List<int> filtroCategorias = seleccionados.Any() ? seleccionados : null;
 

@@ -36,7 +36,7 @@ namespace Desktop
 
         private void ClientesEditForm_Load(object sender, EventArgs e)
         {
-            CategoriaCombobox.DataSource = _categoriaService.GetCategorias().ToList();
+            CategoriaCombobox.DataSource = _categoriaService.GetAllCategorias().ToList();
             ClienteBindingSource.DataSource = _cliente;
 		}
 

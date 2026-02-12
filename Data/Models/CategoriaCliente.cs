@@ -8,8 +8,8 @@ namespace Data.Modelo
 {
 	public enum CategoriaCliente
 	{
-		Standard = 1,
-		Premium = 2,
-		Prueba = 3
+		DePaso = 1,
+		Habitual = 2,
+		VIP = 3
 	}
 }

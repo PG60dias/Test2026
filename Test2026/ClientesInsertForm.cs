@@ -25,7 +25,7 @@ namespace Desktop
 
         private void ClientesInsertForm_Load(object sender, EventArgs e)
         {
-            CategoriaCombobox.DataSource = _categoriaService.GetCategorias().ToList();
+            CategoriaCombobox.DataSource = _categoriaService.GetAllCategorias().ToList();
 
             clienteBindingSource.DataSource = _nuevoCliente;
         }

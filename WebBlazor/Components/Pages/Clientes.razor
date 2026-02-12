@@ -157,7 +157,6 @@
             var cliente = await ClienteRepositoryAsync.GetClienteAsync(dto.Id);
             if (cliente != null)
             {
-                // Corregido Error CS0019: Se elimina el ?? 0 porque Categoria en el modelo ya es int
                 cliente.Categoria = cliente.Categoria + 1;
                 await ClienteRepositoryAsync.UpdateClienteAsync(cliente);
             }

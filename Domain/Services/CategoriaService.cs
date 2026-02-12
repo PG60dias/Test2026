@@ -3,11 +3,16 @@ using Data.Repository.Common;
 
 namespace Domain.Services
 {
-	public class CategoriaService(ICategoriaRepository repository)
+	public class CategoriaService
 	{
-		private readonly ICategoriaRepository _repository = repository;
+		private readonly ICategoriaRepository _repository;
 
-		public IEnumerable<Categoria> GetCategorias()
+		public CategoriaService(ICategoriaRepository repository)
+		{
+			_repository = repository;
+		}
+
+		public IEnumerable<Categoria> GetAllCategorias()
 		{
 			return _repository.GetAllCategorias();
 		}

@@ -16,9 +16,10 @@ namespace API.Controllers
 		}
 
 		[HttpGet]
-		public IEnumerable<Categoria> Get()
+		public ActionResult<IEnumerable<Categoria>> GetCategorias()
 		{
-			return _service.GetCategorias();
+			var lista = _service.GetAllCategorias();
+			return Ok(lista);
 		}
 	}
 }
