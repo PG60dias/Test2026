@@ -32,7 +32,7 @@ builder.Services.AddScoped<Data.Repository.Common.ICategoriaRepository>(provider
 	var context = provider.GetRequiredService<TestDbContext>();
 	return new Data.Repository.API.CategoriaRepository(context);
 });
-
+builder.Services.AddScoped<VentaService>();
 //CONFIGURACION COOKIE
 builder.Services.AddAuthentication(options => {
 	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

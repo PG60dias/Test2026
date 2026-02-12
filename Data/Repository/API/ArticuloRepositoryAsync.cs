@@ -34,5 +34,10 @@ namespace Data.Repository.API
 		{
 			return await _http.GetFromJsonAsync<IEnumerable<Venta>>("Ventas") ?? new List<Venta>();
 		}
-	}
+
+        public Task LimpiarVentasAsync()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

@@ -8,5 +8,6 @@ namespace Data.Repository.Common
 		Task<IEnumerable<CategoriaProducto>> GetCategoriasProductosAsync();
 		Task GenerarVentasMasivasAsync(int cantidad);
 		Task<IEnumerable<Venta>> GetVentasAsync();
+		Task LimpiarVentasAsync();
 	}
 }

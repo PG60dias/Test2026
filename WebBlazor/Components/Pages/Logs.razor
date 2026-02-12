@@ -34,11 +34,11 @@ else
             <RadzenDataGridColumn TItem="Log" Property="UsuarioId" Title="ID Usuario" Width="100px" TextAlign="TextAlign.Center" />
             <RadzenDataGridColumn TItem="Log" Property="Entidad" Title="Entidad">
                 <Template Context="data">
-                    @data.Entidad <strong>(ID: @data.EntidadId)</strong>
+                    @data.Entidad (ID: @data.EntidadId)
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Log" Property="Accion" Title="Acción" Width="120px">
-                <Template Context="data"> Text="@data.Accion" </Template>
+                <Template Context="data"> @data.Accion </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Log" Property="ValorViejo" Title="Valor Anterior" Sortable="false" Filterable="false" />
             <RadzenDataGridColumn TItem="Log" Property="ValorNuevo" Title="Valor Nuevo" Sortable="false" Filterable="false" />
