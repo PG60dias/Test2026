@@ -6,8 +6,9 @@
 @inject ClienteService ClienteService
 @inject CategoriaService CategoriaService
 @inject ILogRepository LogRepository
-@inject DialogService DialogService
+@inject ICategoriaRepositoryAsync CategoriaRepositoryAsync
 @inject IClienteRepositoryAsync ClienteRepositoryAsync
+@inject DialogService DialogService
 
 <RadzenTemplateForm TItem="Cliente" Data="@cliente" Submit="@OnSubmit">
     <RadzenStack Gap="1rem">
@@ -32,9 +33,9 @@
                             Data="@listaCategorias"
                             TextProperty="Nombre"
                             ValueProperty="Id"
+                            TValue="int?"
                             Style="width: 100%;"
-                            Placeholder="Seleccione una categoría"
-                            Name="Categoria" />
+                            Placeholder="Seleccione una categoría" />
         </RadzenFormField>
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.End" Class="rz-mt-4">
@@ -53,12 +54,11 @@
     [Parameter] public bool EsEdicion { get; set; } = false;
     private Cliente? clienteOriginal;
 
-    private IEnumerable<Categoria> listaCategorias;
+    private IEnumerable<Categoria> listaCategorias = new List<Categoria>();
 
     protected override async Task OnInitializedAsync()
     {
-        // Convertimos a carga asíncrona para evitar bloqueos al abrir el diálogo
-        listaCategorias = await Task.Run(() => CategoriaService.GetCategorias());
+        listaCategorias = await CategoriaRepositoryAsync.GetAllCategoriasAsync();
 
         if (EsEdicion)
         {

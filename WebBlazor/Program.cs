@@ -21,8 +21,8 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
 builder.Services.AddScoped<IClienteRepositoryAsync, Data.Repository.API.ClienteRepositoryAsync>();
 builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
-builder.Services.AddScoped<ILogRepository, LogRepository>();
-
+builder.Services.AddScoped<ILogRepository, Data.Repository.API.LogRepository>();
+builder.Services.AddScoped<ICategoriaRepositoryAsync, CategoriaRepositoryAsync>();
 // 2. Servicios de Dominio
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<CategoriaService>();

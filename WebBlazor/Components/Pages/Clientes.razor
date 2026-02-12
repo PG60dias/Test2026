@@ -47,6 +47,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Id" Title="ID" Width="70px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Nombre" Title="Nombre" />
+        <RadzenDataGridColumn TItem="ClienteDTO" Property="Direccion" Title="Dirección" /> @* Corregido: Columna añadida *@
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Email" Title="Email" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Telefono" Title="Teléfono" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="CategoriaNombre" Title="Categoría" />
@@ -71,7 +72,6 @@
         isLoading = true;
         try
         {
-            // Usamos el servicio asíncrono para traer la lista
             clientes = await ClienteService.GetClientesFiltradosWebAsync();
             ActualizarFiltro();
         }
@@ -112,8 +112,6 @@
     private async Task AbrirDialogoEditar(int id)
     {
         isLoading = true;
-        // CORRECTO: Usamos el repositorio asíncrono para obtener un único cliente
-        // Esto evita el crash de deserialización que tenías
         var clienteAEditar = await ClienteRepositoryAsync.GetClienteAsync(id);
         isLoading = false;
 
@@ -154,13 +152,13 @@
 
     private async Task MejoraCategoria()
     {
-        // Ejemplo de lógica masiva asíncrona
         foreach (var dto in selectedClientes)
         {
             var cliente = await ClienteRepositoryAsync.GetClienteAsync(dto.Id);
             if (cliente != null)
             {
-                cliente.Categoria = (cliente.Categoria ?? 0) + 1;
+                // Corregido Error CS0019: Se elimina el ?? 0 porque Categoria en el modelo ya es int
+                cliente.Categoria = cliente.Categoria + 1;
                 await ClienteRepositoryAsync.UpdateClienteAsync(cliente);
             }
         }

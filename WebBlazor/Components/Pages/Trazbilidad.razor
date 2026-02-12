@@ -31,23 +31,18 @@ else
                     LogicalFilterOperator="LogicalFilterOperator.Or">
         <Columns>
             <RadzenDataGridColumn TItem="Log" Property="Fecha" Title="Fecha" FormatString="{0:dd/MM/yyyy HH:mm}" Width="160px" />
-
             <RadzenDataGridColumn TItem="Log" Property="UsuarioId" Title="ID Usuario" Width="100px" TextAlign="TextAlign.Center" />
-
             <RadzenDataGridColumn TItem="Log" Property="Entidad" Title="Entidad">
                 <Template Context="data">
                     @data.Entidad <strong>(ID: @data.EntidadId)</strong>
                 </Template>
             </RadzenDataGridColumn>
-
             <RadzenDataGridColumn TItem="Log" Property="Accion" Title="Acción" Width="120px">
                 <Template Context="data">
                     <RadzenBadge BadgeStyle="@GetBadgeStyle(data.Accion)" Text="@data.Accion" />
                 </Template>
             </RadzenDataGridColumn>
-
             <RadzenDataGridColumn TItem="Log" Property="ValorViejo" Title="Valor Anterior" Sortable="false" Filterable="false" />
-
             <RadzenDataGridColumn TItem="Log" Property="ValorNuevo" Title="Valor Nuevo" Sortable="false" Filterable="false" />
         </Columns>
     </RadzenDataGrid>
@@ -55,31 +50,21 @@ else
 
 @code {
     private IEnumerable<Log>? logs;
-
+    private bool errorCarga = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        try
         {
-            try
-            {
-                logs = await LogRepository.GetLogsAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error cargando logs: {ex.Message}");
-            }
-            finally
-            {
-                StateHasChanged();
-            }
+            // Cargamos los datos aquí para que estén listos antes del renderizado
+            logs = await LogRepository.GetLogsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cargando logs: {ex.Message}");
         }
     }
+
     private BadgeStyle GetBadgeStyle(string accion)
     {
         return accion.ToLower() switch
