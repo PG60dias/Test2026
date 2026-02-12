@@ -7,6 +7,7 @@
 @inject CategoriaService CategoriaService
 @inject ILogRepository LogRepository
 @inject DialogService DialogService
+@inject IClienteRepositoryAsync ClienteRepositoryAsync
 
 <RadzenTemplateForm TItem="Cliente" Data="@cliente" Submit="@OnSubmit">
     <RadzenStack Gap="1rem">
@@ -37,9 +38,12 @@
         </RadzenFormField>
 
         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.End" Class="rz-mt-4">
-            <RadzenButton ButtonType="ButtonType.Submit" Text ="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" />
             <RadzenButton Text="Cancelar" Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" />
-            <RadzenButton Text="Eliminar" Click="@Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
+            @if (EsEdicion)
+            {
+                <RadzenButton Text="Eliminar" Click="@Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
+            }
         </RadzenStack>
     </RadzenStack>
 </RadzenTemplateForm>
@@ -47,16 +51,17 @@
 @code {
     [Parameter] public Cliente cliente { get; set; } = new Cliente();
     [Parameter] public bool EsEdicion { get; set; } = false;
-    private Cliente? clienteOriginal; // Para comparar cambios
+    private Cliente? clienteOriginal;
 
     private IEnumerable<Categoria> listaCategorias;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        listaCategorias = CategoriaService.GetCategorias();
+        // Convertimos a carga asíncrona para evitar bloqueos al abrir el diálogo
+        listaCategorias = await Task.Run(() => CategoriaService.GetCategorias());
+
         if (EsEdicion)
         {
-            // Clonamos el objeto para la trazabilidad
             clienteOriginal = new Cliente
             {
                 Nombre = cliente.Nombre,
@@ -72,16 +77,15 @@
         {
             if (EsEdicion)
             {
-                // Llamada asíncrona al repositorio (asegúrate de que el repo soporte UpdateClienteAsync)
-                ClienteService.Repository.UpdateCliente(cliente);
+                // Usamos el nuevo repositorio asíncrono directamente
+                await ClienteRepositoryAsync.UpdateClienteAsync(cliente);
 
-                // Registro de trazabilidad
                 await LogRepository.AddLogAsync(new Log
                 {
-                    UsuarioId = 1, // Obtener del auth state
+                    UsuarioId = 1,
                     Entidad = "Cliente",
                     EntidadId = cliente.Id,
-                    Accion = "Update",
+                    Accion = "Update (Web)",
                     ValorViejo = $"Nombre: {clienteOriginal?.Nombre}, Cat: {clienteOriginal?.Categoria}",
                     ValorNuevo = $"Nombre: {cliente.Nombre}, Cat: {cliente.Categoria}",
                     Fecha = DateTime.Now
@@ -89,7 +93,8 @@
             }
             else
             {
-                ClienteService.Repository.AddCliente(cliente);
+                // Creación asíncrona
+                await ClienteRepositoryAsync.AddClienteAsync(cliente);
             }
 
             DialogService.Close(true);
@@ -105,14 +110,15 @@
         var confirmar = await DialogService.Confirm("¿Eliminar este cliente?", "Confirmar");
         if (confirmar == true)
         {
-            ClienteService.Repository.DeleteCliente(cliente.Id);
+            // Eliminación asíncrona
+            await ClienteRepositoryAsync.DeleteClienteAsync(cliente.Id);
 
             await LogRepository.AddLogAsync(new Log
             {
                 UsuarioId = 1,
                 EntidadId = cliente.Id,
                 Entidad = "Cliente",
-                Accion = "Delete",
+                Accion = "Delete (Web)",
                 ValorViejo = cliente.Nombre,
                 Fecha = DateTime.Now
             });

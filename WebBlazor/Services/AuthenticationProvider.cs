@@ -1,19 +1,23 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server;
+﻿
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
 namespace WebBlazor.Services
 {
-	public class AuthenticationProvider : ServerAuthenticationStateProvider
+	public class AuthenticationProvider : AuthenticationStateProvider
 	{
 		public override Task<AuthenticationState> GetAuthenticationStateAsync()
 		{
-			return base.GetAuthenticationStateAsync();
+			var identity = new ClaimsIdentity();
+			var user = new ClaimsPrincipal(identity);
+			return Task.FromResult(new AuthenticationState(user));
 		}
 
-		public void NotifyAuthenticationStateChanged()
+		public void NotifyUserAuthentication(string email)
 		{
-			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+			var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, email) }, "apiauth_type");
+			var user = new ClaimsPrincipal(identity);
+			NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
 		}
 	}
 }

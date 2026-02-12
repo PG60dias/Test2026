@@ -1,91 +1,52 @@
 ﻿@page "/clientes"
 @using Data.DTOs
-@using Data.Models
 @using Data.Modelo
+@using Data.Models
 @using Data.Repository.Common
+@using Domain.Services
 @attribute [Authorize]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 @inject ClienteService ClienteService
-@inject CategoriaService CategoriaService
+@inject IClienteRepositoryAsync ClienteRepositoryAsync
 @inject DialogService DialogService
-@inject WebBlazor.Services.ExportService ExportService
-@inject ILogRepository LogRepository
-@inject HttpClient Http
 @inject NavigationManager Navigation
+@inject HttpClient Http
+@inject ILogRepository LogRepository
+@inject WebBlazor.Services.ExportService ExportService
 
 <PageTitle>Clientes</PageTitle>
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-mb-4">
     <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-m-0">Clientes</RadzenText>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End">
-        <RadzenButton Text="Cerrar Sesión"
-                      Icon="logout"
-                      ButtonStyle="ButtonStyle.Danger"
-                      Size="ButtonSize.ExtraSmall"
-                      Variant="Variant.Flat"
-                      Click="@ManejarLogout" />
+        <RadzenButton Text="Cerrar Sesión" Icon="logout" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.ExtraSmall" Variant="Variant.Flat" Click="@ManejarLogout" />
     </RadzenStack>
 </RadzenStack>
 
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" Class="rz-mb-4">
-    <RadzenButton Text="@($"Borrar {(selectedClientes?.Count ?? 0)} clientes")"
-                  Icon="delete"
-                  Size="ButtonSize.Small"
-                  ButtonStyle="ButtonStyle.Danger"
-                  Click="@EliminarClientesSeleccionados"
-                  Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
-
-    <RadzenButton Text="Subir Categoría"
-                  Icon="open_in_browser"
-                  Size="ButtonSize.Small"
-                  ButtonStyle="ButtonStyle.Secondary"
-                  Click="@MejoraCategoria"
-                  Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
-
-    <RadzenButton Text="Agregar"
-                  Icon="add_circle"
-                  Size="ButtonSize.Small"
-                  ButtonStyle="ButtonStyle.Primary"
-                  Click="@AbrirDialogoAgregar" />
+    <RadzenButton Text="@($"Borrar {(selectedClientes?.Count ?? 0)} clientes")" Icon="delete" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" Click="@EliminarClientesSeleccionados" Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
+    <RadzenButton Text="Subir Categoría" Icon="update" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@MejoraCategoria" Disabled="@(selectedClientes == null || !selectedClientes.Any())" />
+    <RadzenButton Text="Agregar" Icon="add_circle" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Primary" Click="@AbrirDialogoAgregar" />
 </RadzenStack>
 
 <RadzenStack Orientation="Orientation.Horizontal" Class="rz-mb-4">
     <RadzenIcon Icon="search" />
-    <RadzenTextBox Placeholder="Buscar en todos los campos..."
-                   Style="width: 100%;"
-                   @oninput="@OnSearch" />
+    <RadzenTextBox Placeholder="Buscar por nombre o email..." Style="width: 100%;" @oninput="@OnSearch" />
 </RadzenStack>
 
-<RadzenDataGrid @ref="grid"
-                Data="@clientesFiltrados"
-                TItem="ClienteDTO"
-                IsLoading="@isLoading"
-                RowSelect="@(args => AbrirDialogoEditar(args.Id))"
-                AllowPaging="true"
-                PageSize="12"
-                AllowSorting="true"
-                Style="cursor:pointer">
+<RadzenDataGrid @ref="grid" Data="@clientesFiltrados" TItem="ClienteDTO" IsLoading="@isLoading" RowSelect="@(args => AbrirDialogoEditar(args.Id))" AllowPaging="true" PageSize="12" AllowSorting="true" Style="cursor:pointer; height: 600px;">
     <Columns>
         <RadzenDataGridColumn TItem="ClienteDTO" Width="60px" Sortable="false" Filterable="false">
             <HeaderTemplate>
-                <RadzenCheckBox TabIndex="-1"
-                                TriState="false"
-                                TValue="bool?"
-                                Value="@(selectedClientes == null || !selectedClientes.Any() ? false : (clientes?.Count() == selectedClientes.Count() ? true : (bool?)null))"
-                                Change="@(args => selectedClientes = args == true ? clientes?.ToList() ?? new List<ClienteDTO>() : new List<ClienteDTO>())" />
+                <RadzenCheckBox TabIndex="-1" TriState="false" TValue="bool?" Value="@(selectedClientes == null || !selectedClientes.Any() ? false : (clientes?.Count() == selectedClientes.Count() ? true : (bool?)null))" Change="@(args => selectedClientes = args == true ? clientes?.ToList() ?? new List<ClienteDTO>() : new List<ClienteDTO>())" />
             </HeaderTemplate>
             <Template Context="data">
-                <RadzenCheckBox TabIndex="-1"
-                                TriState="false"
-                                Value="@(selectedClientes != null && selectedClientes.Contains(data))"
-                                TValue="bool"
-                                Change="@(args => OnCheckBoxChange(args, data))"
-                                @onclick:stopPropagation="true" />
+                <RadzenCheckBox TabIndex="-1" TriState="false" Value="@(selectedClientes != null && selectedClientes.Contains(data))" TValue="bool" Change="@(args => OnCheckBoxChange(args, data))" @onclick:stopPropagation="true" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Id" Title="ID" Width="70px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Nombre" Title="Nombre" />
-        <RadzenDataGridColumn TItem="ClienteDTO" Property="Direccion" Title="Dirección" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Email" Title="Email" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="Telefono" Title="Teléfono" />
         <RadzenDataGridColumn TItem="ClienteDTO" Property="CategoriaNombre" Title="Categoría" />
@@ -100,25 +61,24 @@
     private bool isLoading = true;
     private RadzenDataGrid<ClienteDTO> grid;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            await CargarDatosAsync();
-        }
+        await CargarDatosAsync();
     }
 
     private async Task CargarDatosAsync()
     {
         isLoading = true;
-        StateHasChanged();
-
-        // Ejecución asíncrona para no bloquear la web
-        clientes = await Task.Run(() => ClienteService.GetClientesFiltrados());
-        ActualizarFiltro();
-
-        isLoading = false;
-        StateHasChanged();
+        try
+        {
+            // Usamos el servicio asíncrono para traer la lista
+            clientes = await ClienteService.GetClientesFiltradosWebAsync();
+            ActualizarFiltro();
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private void OnSearch(ChangeEventArgs args)
@@ -127,53 +87,65 @@
         ActualizarFiltro();
     }
 
+    private void ActualizarFiltro()
+    {
+        if (string.IsNullOrWhiteSpace(textoBusqueda))
+        {
+            clientesFiltrados = clientes?.ToList();
+        }
+        else
+        {
+            var b = textoBusqueda.ToLower();
+            clientesFiltrados = clientes?.Where(c =>
+                (c.Nombre?.Contains(b, StringComparison.OrdinalIgnoreCase) == true) ||
+                (c.Email?.Contains(b, StringComparison.OrdinalIgnoreCase) == true)
+            ).ToList();
+        }
+    }
+
     private void OnCheckBoxChange(bool value, ClienteDTO data)
     {
         if (value) selectedClientes.Add(data);
         else selectedClientes.Remove(data);
     }
 
-    private void ActualizarFiltro()
+    private async Task AbrirDialogoEditar(int id)
     {
-        if (string.IsNullOrWhiteSpace(textoBusqueda))
-        {
-            clientesFiltrados = clientes;
-        }
-        else
-        {
-            var busqueda = textoBusqueda.ToLower();
-            clientesFiltrados = clientes?.Where(c =>
-                (c.Nombre?.ToLower().Contains(busqueda) ?? false) ||
-                (c.Direccion?.ToLower().Contains(busqueda) ?? false) ||
-                (c.Email?.ToLower().Contains(busqueda) ?? false) ||
-                (c.Telefono?.ToLower().Contains(busqueda) ?? false) ||
-                (c.CategoriaNombre?.ToLower().Contains(busqueda) ?? false)
-            ).ToList();
-        }
+        isLoading = true;
+        // CORRECTO: Usamos el repositorio asíncrono para obtener un único cliente
+        // Esto evita el crash de deserialización que tenías
+        var clienteAEditar = await ClienteRepositoryAsync.GetClienteAsync(id);
+        isLoading = false;
+
+        var resultado = await DialogService.OpenAsync<ClienteDetalle>($"Editar Cliente #{id}",
+            new Dictionary<string, object> {
+                { "cliente", clienteAEditar },
+                { "EsEdicion", true }
+            });
+
+        if (resultado == true) await CargarDatosAsync();
+    }
+
+    private async Task AbrirDialogoAgregar()
+    {
+        var resultado = await DialogService.OpenAsync<ClienteDetalle>("Nuevo Cliente",
+            new Dictionary<string, object> {
+                { "cliente", new Cliente() },
+                { "EsEdicion", false }
+            });
+
+        if (resultado == true) await CargarDatosAsync();
     }
 
     private async Task EliminarClientesSeleccionados()
     {
-        var confirmar = await DialogService.Confirm(
-            $"¿Estás seguro de que deseas eliminar {selectedClientes.Count} clientes?",
-            "Eliminar Múltiples");
-
-        if (confirmar == true)
+        var confirm = await DialogService.Confirm($"¿Eliminar {selectedClientes.Count} clientes?", "Eliminar");
+        if (confirm == true)
         {
-            foreach (var cliente in selectedClientes.ToList())
+            isLoading = true;
+            foreach (var item in selectedClientes.ToList())
             {
-                ClienteService.Repository.DeleteCliente(cliente.Id);
-
-                // Trazabilidad de eliminación masiva
-                await LogRepository.AddLogAsync(new Log
-                {
-                    UsuarioId = 1, // Reemplazar con ID real del usuario
-                    EntidadId = cliente.Id,
-                    Entidad = "Cliente",
-                    Accion = "Eliminación Masiva (Web)",
-                    ValorViejo = cliente.Nombre,
-                    Fecha = DateTime.Now
-                });
+                await ClienteRepositoryAsync.DeleteClienteAsync(item.Id);
             }
             selectedClientes.Clear();
             await CargarDatosAsync();
@@ -182,85 +154,22 @@
 
     private async Task MejoraCategoria()
     {
-        var confirmar = await DialogService.Confirm(
-            "¿Subir categoría a los clientes seleccionados?",
-            "Mejorar Categoría");
-
-        if (confirmar == true)
+        // Ejemplo de lógica masiva asíncrona
+        foreach (var dto in selectedClientes)
         {
-            foreach (var item in selectedClientes.ToList())
+            var cliente = await ClienteRepositoryAsync.GetClienteAsync(dto.Id);
+            if (cliente != null)
             {
-                var clienteUpdate = ClienteService.Repository.GetCliente(item.Id);
-                if (clienteUpdate != null)
-                {
-                    int viejaCat = clienteUpdate.Categoria; // Sin error de tipo
-                    bool cambio = false;
-
-                    if (clienteUpdate.Categoria == 3)
-                    {
-                        clienteUpdate.Categoria = 1;
-                        cambio = true;
-                    }
-                    else if (clienteUpdate.Categoria == 1)
-                    {
-                        clienteUpdate.Categoria = 2;
-                        cambio = true;
-                    }
-
-                    if (cambio)
-                    {
-                        ClienteService.Repository.UpdateCliente(clienteUpdate);
-
-                        // Registro en AuditLogs
-                        await LogRepository.AddLogAsync(new Log
-                        {
-                            UsuarioId = 1,
-                            EntidadId = clienteUpdate.Id,
-                            Entidad = "Cliente",
-                            Accion = "Mejora Categoría",
-                            ValorViejo = viejaCat.ToString(),
-                            ValorNuevo = clienteUpdate.Categoria.ToString(),
-                            Fecha = DateTime.Now
-                        });
-                    }
-                }
+                cliente.Categoria = (cliente.Categoria ?? 0) + 1;
+                await ClienteRepositoryAsync.UpdateClienteAsync(cliente);
             }
-            selectedClientes.Clear();
-            await CargarDatosAsync();
         }
-    }
-
-    private async Task AbrirDialogoAgregar()
-    {
-        var res = await DialogService.OpenAsync<ClienteDetalle>("Registrar Nuevo Cliente",
-            new Dictionary<string, object> { { "cliente", new Cliente() } });
-        if (res == true) await CargarDatosAsync();
-    }
-
-    private async Task AbrirDialogoEditar(int id)
-    {
-        var clienteAEditar = ClienteService.Repository.GetCliente(id);
-        var res = await DialogService.OpenAsync<ClienteDetalle>($"Editar Cliente #{id}",
-            new Dictionary<string, object> {
-                { "cliente", clienteAEditar },
-                { "EsEdicion", true }
-            });
-        if (res == true) await CargarDatosAsync();
+        await CargarDatosAsync();
     }
 
     private async Task ManejarLogout()
     {
         await Http.PostAsync("api/auth/logout", null);
         Navigation.NavigateTo("/", forceLoad: true);
-    }
-
-    public void Export(string type)
-    {
-        var query = new Query()
-        {
-            OrderBy = grid.Query.OrderBy,
-            Filter = grid.Query.Filter
-        };
-        ExportService.Export("Clientes", type, query);
     }
 }

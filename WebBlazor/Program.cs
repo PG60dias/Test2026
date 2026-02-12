@@ -2,33 +2,36 @@ using Data.Repository.Common;
 using Domain.Services;
 using Data.Repository.API;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Authorization;
 using Radzen;
 using WebBlazor.Components;
 using WebBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Servicios base
+// Servicios base de Blazor
 builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents();
 
-builder.Services.AddControllers(); 
+builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 
-// Inyección de dependencias existente
+// --- INYECCIÓN DE DEPENDENCIAS ---
+
+// 1. Repositorios (Mantenemos el síncrono por compatibilidad y añadimos el asíncrono)
 builder.Services.AddScoped<IClienteRepository, Data.Repository.API.ClienteRepository>();
+builder.Services.AddScoped<IClienteRepositoryAsync, Data.Repository.API.ClienteRepositoryAsync>();
 builder.Services.AddScoped<ICategoriaRepository, Data.Repository.API.CategoriaRepository>();
 builder.Services.AddScoped<ILogRepository, LogRepository>();
 
+// 2. Servicios de Dominio
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<CategoriaService>();
 
+// 3. Servicios Auxiliares de la Web
 builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<ExportService>();
+builder.Services.AddScoped<WebBlazor.Services.ExportService>();
 
-// Configuración de Autenticación en Blazor
-builder.Services.AddCascadingAuthenticationState();
+// --- AUTENTICACIÓN ---
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 	.AddCookie(options =>
 	{
@@ -38,9 +41,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 	});
 
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProvider>();
 
-// HttpClient configurado para la API
+// HttpClient configurado para la API (usado por el Repositorio Async)
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5000/") });
 
 var app = builder.Build();

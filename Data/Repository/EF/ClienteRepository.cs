@@ -1,4 +1,5 @@
-﻿using Data.Common;
+﻿using System.Linq;
+using Data.Common;
 using Data.DTOs;
 using Data.Modelo;
 using Data.Repository.Common;
@@ -57,7 +58,7 @@ namespace Data.Repository.EF
 
 			if (categoriaIds != null && categoriaIds.Any())
 			{
-				query = query.Where(c => categoriaIds.Contains(c.Categoria));
+				query = query.Where(c => categoriaIds.Contains((int)c.Categoria));
 			}
 
 			if (!string.IsNullOrWhiteSpace(busqueda))

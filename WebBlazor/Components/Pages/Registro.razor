@@ -1,8 +1,10 @@
 ﻿@page "/registro"
+@using Data.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject NotificationService NotificationService
-@rendermode InteractiveServer
+@* Desactivamos el prerender para evitar bloqueos en la carga inicial *@
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <PageTitle>Registro - Test2026</PageTitle>
 
@@ -18,11 +20,13 @@
             <RadzenStack Gap="0.5rem">
                 <RadzenText TextStyle="TextStyle.Subtitle2">Correo Electrónico</RadzenText>
                 <RadzenTextBox @bind-Value="user.Email" Style="width: 100%;" />
+                <ValidationMessage For="@(() => user.Email)" />
             </RadzenStack>
 
             <RadzenStack Gap="0.5rem">
                 <RadzenText TextStyle="TextStyle.Subtitle2">Contraseña</RadzenText>
                 <RadzenPassword @bind-Value="user.Password" Style="width: 100%;" />
+                <ValidationMessage For="@(() => user.Password)" />
             </RadzenStack>
 
             <RadzenButton ButtonType="ButtonType.Submit"
@@ -45,6 +49,7 @@
     {
         try
         {
+            // La llamada usa el HttpClient configurado en Program.cs
             var response = await Http.PostAsJsonAsync("api/auth/register", user);
 
             if (response.IsSuccessStatusCode)
@@ -58,7 +63,7 @@
                 NotificationService.Notify(NotificationSeverity.Error, "Error", error);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "No se pudo conectar con el servidor.");
         }

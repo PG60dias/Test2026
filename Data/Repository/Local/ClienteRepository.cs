@@ -78,7 +78,7 @@ namespace Data.Repository.Local
 
 			if (categoriaIds != null && categoriaIds.Any())
 			{
-				query = query.Where(c => categoriaIds.Contains(c.Categoria));
+				query = query.Where(c => categoriaIds.Contains((int)c.Categoria));
 			}
 
 			if (!string.IsNullOrWhiteSpace(busqueda))

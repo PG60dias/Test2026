@@ -47,18 +47,20 @@ namespace Data.Repository.API
             return JsonSerializer.Deserialize<IEnumerable<ClienteDTO>>(json, _jsonSerializerOptions);
 
 		}
-
 		public Cliente? GetCliente(int id)
-        {
+		{
 			var request = new HttpRequestMessage(HttpMethod.Get, API_ENDPOINT + "Clientes/" + id);
 			var response = _httpClient.Send(request);
 			response.EnsureSuccessStatusCode();
-			var json = Task.Run(() => response.Content.ReadAsStringAsync()).GetAwaiter().GetResult();
 
-			return JsonSerializer.Deserialize<Cliente>(json, _jsonSerializerOptions);
+			using (var reader = new StreamReader(response.Content.ReadAsStream()))
+			{
+				var json = reader.ReadToEnd();
+				// CORRECCIÓN: Deserializa a 'Cliente', no a 'IEnumerable<ClienteDTO>'
+				return JsonSerializer.Deserialize<Cliente>(json, _jsonSerializerOptions);
+			}
 		}
-
-        public IEnumerable<ClienteDTO> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
+		public IEnumerable<ClienteDTO> GetClientesFiltrados(List<int> categoriaIds = null, string busqueda = null)
         {
 
 			var consulta = GetAllClientes().AsQueryable();

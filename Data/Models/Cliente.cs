@@ -27,7 +27,7 @@ public partial class Cliente
     [Unicode(false)]
     public string? Telefono { get; set; } = string.Empty;
 
-	public int Categoria { get; set; }
+	public int? Categoria { get; set; }
 
     [NotMapped]
     public string CategoriaNombre => CategoriaNavigation?.Nombre ?? "Sin Categoría";
