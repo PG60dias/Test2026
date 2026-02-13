@@ -35,7 +35,17 @@
     <RadzenTextBox Placeholder="Buscar por nombre o email..." Style="width: 100%;" @oninput="@OnSearch" />
 </RadzenStack>
 
-<RadzenDataGrid @ref="grid" Data="@clientesFiltrados" TItem="ClienteDTO" IsLoading="@isLoading" RowSelect="@(args => AbrirDialogoEditar(args.Id))" AllowPaging="true" PageSize="12" AllowSorting="true" Style="cursor:pointer; height: 600px;">
+<RadzenDataGrid @ref="grid" 
+                Data="@clientesFiltrados" 
+                TItem="ClienteDTO" 
+                IsLoading="@isLoading" 
+                RowSelect="@(args => AbrirDialogoEditar(args.Id))" 
+                AllowPaging="true" 
+                ShowPagingSummary="true"
+                PageSize="12" 
+                AllowSorting="true" 
+                Style="cursor:pointer; 
+                height: 600px;">
     <Columns>
         <RadzenDataGridColumn TItem="ClienteDTO" Width="60px" Sortable="false" Filterable="false">
             <HeaderTemplate>
@@ -97,8 +107,12 @@
         {
             var b = textoBusqueda.ToLower();
             clientesFiltrados = clientes?.Where(c =>
+                (c.Id.ToString().Contains(b, StringComparison.OrdinalIgnoreCase) == true) ||
                 (c.Nombre?.Contains(b, StringComparison.OrdinalIgnoreCase) == true) ||
-                (c.Email?.Contains(b, StringComparison.OrdinalIgnoreCase) == true)
+                (c.Email?.Contains(b, StringComparison.OrdinalIgnoreCase) == true) ||
+                (c.Direccion?.Contains(b, StringComparison.OrdinalIgnoreCase) == true) ||
+                (c.Telefono.Contains(b, StringComparison.OrdinalIgnoreCase) == true) ||
+                (c.CategoriaNombre.Contains(b, StringComparison.OrdinalIgnoreCase) == true)
             ).ToList();
         }
     }

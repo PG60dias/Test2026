@@ -8,22 +8,19 @@
 <RadzenText TextStyle="TextStyle.H3">Gestión de Ventas</RadzenText>
 
 
-<RadzenButton Text="Generar 10 Ventas"
+<RadzenButton Text="Generar ventas"
               ButtonStyle="ButtonStyle.Warning"
-              Click="@(() => ProcesarVentas(10))"
-              Disabled="@isProcessing" />
+              Click="@(() => ProcesarVentas(10))"/>
 
-<RadzenButton Text="Refrescar Tabla"
-              ButtonStyle="ButtonStyle.Secondary"
-              Click="@CargarVentas"
-              Disabled="@isProcessing" />
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+    @if (isLoading)
+    {
+        <RadzenText>Procesando registros...</RadzenText>
+    }
+</RadzenStack>
 
-
-<RadzenDataGrid AllowFiltering="true"
+<RadzenDataGrid AllowSorting="true"
                 AllowColumnResize="true"
-                AllowAlternatingRows="false"
-                FilterMode="FilterMode.Advanced"
-                AllowSorting="true"
                 PageSize="10"
                 AllowPaging="true"
                 PagerHorizontalAlign="HorizontalAlign.Left"
@@ -72,7 +69,10 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="Venta" Title="Importe Total" Width="150px">
             <Template Context="venta">
-                @venta.Detalles.Sum(d => d.PrecioAplicado * d.Cantidad).ToString("C2")
+                @{
+                    var total = venta.Detalles?.Sum(d => d.Cantidad * d.PrecioAplicado) ?? 0;
+                    @total.ToString("C2")
+                }
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -81,7 +81,7 @@
 @code {
     RadzenDataGrid<Venta> gridVentas;
     IEnumerable<Venta> ventas;
-    bool isProcessing = false;
+    bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,13 +90,23 @@
 
     async Task CargarVentas()
     {
-        ventas = await ArticuloRepo.GetVentasAsync();
-
-        if (gridVentas != null)
-        {
-            await gridVentas.Reload();
-        }
+        isLoading = true;
         StateHasChanged();
+
+        try
+        {
+            ventas = await ArticuloRepo.GetVentasAsync();
+
+            if (gridVentas != null)
+            {
+                await gridVentas.Reload();
+            }
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     async Task ProcesarVentas(int cantidad)
@@ -104,22 +114,26 @@
         var confirm = await DialogService.Confirm($"Quieres generar {cantidad} ventas?", "Generador");
         if (confirm == true)
         {
-           try
-        {
-            await ArticuloRepo.GenerarVentasMasivasAsync(cantidad);
-            await CargarVentas();
-            NotificationService.Notify(NotificationSeverity.Success, "Éxito", $"Generadas {cantidad} ventas");
+            isLoading = true;
+            StateHasChanged();
+
+            try
+            {
+                await ArticuloRepo.GenerarVentasMasivasAsync(cantidad);
+                await CargarVentas();
+
+                NotificationService.Notify(NotificationSeverity.Success, "Éxito", $"Generadas {cantidad} ventas");
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Error", ex.Message);
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
         }
-        catch (Exception ex)
-        {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", ex.Message);
-        }
-        finally
-        {
-            isProcessing = false;
-        } 
-        }
-        
     }
 
 }

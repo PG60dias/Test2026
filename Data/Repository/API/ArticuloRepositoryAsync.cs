@@ -9,6 +9,7 @@ namespace Data.Repository.API
 	public class ArticuloRepositoryAsync : IArticuloRepository
 	{
 		private readonly HttpClient _http;
+		private IEnumerable<Venta> _cacheVentas;
 
 		public ArticuloRepositoryAsync(HttpClient http)
 		{
@@ -32,7 +33,10 @@ namespace Data.Repository.API
 
 		public async Task<IEnumerable<Venta>> GetVentasAsync()
 		{
-			return await _http.GetFromJsonAsync<IEnumerable<Venta>>("Ventas") ?? new List<Venta>();
+			if (_cacheVentas != null) return _cacheVentas; 
+
+			_cacheVentas = await _http.GetFromJsonAsync<IEnumerable<Venta>>("Ventas");
+			return _cacheVentas;
 		}
 
         public Task LimpiarVentasAsync()

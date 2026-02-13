@@ -28,9 +28,10 @@ public class VentasController : ControllerBase
 	public async Task<ActionResult<IEnumerable<Venta>>> GetVentas()
 	{
 		return await _context.Ventas
+			//.Include(v => v.Cliente)
 			.Include(v => v.Detalles)
 			.ThenInclude(d => d.Articulo)
-			.OrderByDescending(v => v.Fecha)
+			.OrderBy(v => v.Fecha)
 			.ToListAsync();
 	}
 }

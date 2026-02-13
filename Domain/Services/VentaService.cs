@@ -20,7 +20,7 @@ namespace Domain.Services
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
-				var clientes = await _context.Clientes.ToListAsync();
+				var clientes = await _context.Clientes.AsNoTracking().ToListAsync();
 				var articulos = await _context.Articulos.ToListAsync();
 
 				if (!clientes.Any() || !articulos.Any()) return;
@@ -38,11 +38,10 @@ namespace Domain.Services
 
 					int tiposArticulos = _random.Next(1, 6);
 					for (int j = 0; j < tiposArticulos; j++)
-					{
+					{ 
 						var articulo = articulos[_random.Next(articulos.Count)];
-						var strategy = PrecioCategorias.ObtenerPrecioCat(cliente.Categoria);
-						decimal precioFinal = strategy.Calcular(articulo.PVP);
-
+						var precioCat = PrecioCategorias.ObtenerPrecioCat(cliente.Categoria);
+						decimal precioFinal = precioCat.Calcular(articulo.PVP);
 						nuevaVenta.Detalles.Add(new VentaDetalle
 						{
 							ArticuloId = articulo.Id,
